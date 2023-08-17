@@ -8,7 +8,7 @@ public class RobotMap {
      BACK_RIGHT_DRIVE_MOTOR = 4;
 
     /** Steering Motor CAN IDs */
-    public int FRONT_LEFT_STEERNIG_MOTOR_CAN_ID = 5,
+    public int FRONT_LEFT_STEERING_MOTOR_CAN_ID = 5,
      FRONT_RIGHT_STEERING_MOTOR_CAN_ID = 6,
      BACK_LEFT_STEERING_MOTOR_CAN_ID = 7,
      BACK_RIGHT_STEERING_MOTOR_CAN_ID = 8;
