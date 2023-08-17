@@ -13,4 +13,9 @@ public class Arm extends SubsystemBase {
   public void periodic() {
     // This method will be called once per scheduler run
   }
+
+  public void highMidPos(){}
+  public void lowPos(){}
+  public void initialize(){}
+  public void avoidDanger(){}
 }
