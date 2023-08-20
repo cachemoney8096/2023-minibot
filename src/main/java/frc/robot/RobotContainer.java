@@ -4,8 +4,6 @@
 
 package frc.robot;
 
-import frc.robot.Constants.OperatorConstants;
-
 import frc.robot.commands.ExampleCommand;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.ClawLimelight;
