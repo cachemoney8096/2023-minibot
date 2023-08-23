@@ -4,19 +4,14 @@
 
 package frc.robot;
 
-import frc.robot.commands.ExampleCommand;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.ClawLimelight;
 import frc.robot.subsystems.Grabber;
 import frc.robot.subsystems.Lights;
 import frc.robot.subsystems.TagLimelight;
 import frc.robot.subsystems.drive.DriveSubsystem;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
-
-
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -31,8 +26,7 @@ public class RobotContainer {
   private Grabber grabber = new Grabber();
   private Lights lights = new Lights();
   private TagLimelight tagLimelight = new TagLimelight();
-  private DriveSubsystem drive = new DriveSubsystem(); 
-
+  private DriveSubsystem drive = new DriveSubsystem();
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
 
@@ -51,9 +45,7 @@ public class RobotContainer {
    * PS4} controllers or {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick Flight
    * joysticks}.
    */
-
-  private void configureBindings() {
-  }
+  private void configureBindings() {}
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
