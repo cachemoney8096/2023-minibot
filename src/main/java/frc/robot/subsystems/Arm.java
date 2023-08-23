@@ -14,8 +14,8 @@ public class Arm extends SubsystemBase {
     // This method will be called once per scheduler run
   }
 
-  public void highMidPos(){}
-  public void lowPos(){}
+  public void setHighMidPos(){}
+  public void setLowPos(){}
   public void initialize(){}
   public void avoidDanger(){}
 }
