@@ -4,6 +4,8 @@ import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 
 public class ArmCal {
     public static final double PLACEHOLDER_DOUBLE = 0.0;
+    public static final float PLACEHOLDER_FLOAT = 0;
+    public static final int PLACEHOLDER_INT = 0;
     
     public static final double ARM_P = PLACEHOLDER_DOUBLE;
     public static final double ARM_I = PLACEHOLDER_DOUBLE;
@@ -35,5 +37,9 @@ public class ArmCal {
             0.0, 1.5 * (2.0 * Math.PI) / 360.0, 0.08 * (2.0 * Math.PI) / 360.0);
 
     public static final double ARBITRARY_ARM_FEED_FORWARD_VOLTS = PLACEHOLDER_DOUBLE;
+
+    public static final float ARM_NEGATIVE_LIMIT_DEGREES = PLACEHOLDER_FLOAT;
+    public static final float ARM_POSITIVE_LIMIT_DEGREES = PLACEHOLDER_FLOAT;
+    public static final int ARM_CURRENT_LIMIT_AMPS = PLACEHOLDER_INT;
 
 }

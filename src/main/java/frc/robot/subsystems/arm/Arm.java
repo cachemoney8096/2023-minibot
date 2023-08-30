@@ -8,15 +8,21 @@ import java.util.TreeMap;
 
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.REVLibError;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.CANSparkMax.ControlType;
+import com.revrobotics.CANSparkMax.IdleMode;
+import com.revrobotics.CANSparkMax.SoftLimitDirection;
 import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
 
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.util.sendable.SendableBuilder;
+import frc.robot.utils.SendableHelper;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -230,5 +236,127 @@ public class Arm extends SubsystemBase {
   public void zeroArmAtCurrentPos() {
     ArmCal.ARM_ABSOLUTE_ENCODER_ZERO_POS_DEG = armAbsoluteEncoder.getPosition();
     System.out.println("New Zero for Arm: " + ArmCal.ARM_ABSOLUTE_ENCODER_ZERO_POS_DEG);
+  }
+
+  private REVLibError setDegreesFromGearRatio(
+        AbsoluteEncoder sparkMaxEncoder, double ratio) {
+      double degreesPerRotation = 360.0 / ratio;
+      double degreesPerRotationPerSecond = degreesPerRotation / 60.0;
+      REVLibError error = sparkMaxEncoder.setPositionConversionFactor(degreesPerRotation);
+
+      if (error != REVLibError.kOk) {
+        return error;
+      }
+
+      return sparkMaxEncoder.setVelocityConversionFactor(degreesPerRotationPerSecond);
+    }
+
+    public static REVLibError setDegreesFromGearRatio(
+        RelativeEncoder sparkMaxEncoder, double ratio) {
+      double degreesPerRotation = 360.0 / ratio;
+      double degreesPerRotationPerSecond = degreesPerRotation / 60.0;
+      REVLibError error = sparkMaxEncoder.setPositionConversionFactor(degreesPerRotation);
+
+      if (error != REVLibError.kOk) {
+        return error;
+      }
+
+      return sparkMaxEncoder.setVelocityConversionFactor(degreesPerRotationPerSecond);
+    }
+
+  /** Does all the initialization for the sparks */
+  private void initSparks() {
+
+    armMotor.restoreFactoryDefaults();
+
+    // inverting stuff
+    armAbsoluteEncoder.setInverted(true);
+    armMotor.setInverted(false);
+
+    // Get positions and degrees of elevator through encoder in inches
+    setDegreesFromGearRatio(
+                armEncoder, ArmConstants.ARM_MOTOR_GEAR_RATIO);
+
+    setDegreesFromGearRatio(armAbsoluteEncoder, 1.0);
+
+    armMotor.setSoftLimit(
+                SoftLimitDirection.kForward, ArmCal.ARM_POSITIVE_LIMIT_DEGREES);
+
+    armMotor.enableSoftLimit(SoftLimitDirection.kForward, true);
+
+    armMotor.setSoftLimit(
+                SoftLimitDirection.kReverse, ArmCal.ARM_NEGATIVE_LIMIT_DEGREES);
+
+    armMotor.enableSoftLimit(SoftLimitDirection.kReverse, true);
+
+    armMotor.setIdleMode(IdleMode.kBrake);
+
+    armMotor.setSmartCurrentLimit(ArmCal.ARM_CURRENT_LIMIT_AMPS);
+  }
+
+  /**
+   * Burns the current settings to sparks so they keep current settings on reboot. Should be done
+   * after all settings are set.
+   */
+  public void burnFlashSparks() {
+    Timer.delay(0.005);
+    armMotor.burnFlash();
+  }
+
+  @Override
+  public void initSendable(SendableBuilder builder) {
+    super.initSendable(builder);
+    SendableHelper.addChild(builder, this, armController, "ArmController");
+    
+
+    builder.addDoubleProperty(
+        "Arm Abs Position (deg)", armAbsoluteEncoder::getPosition, armEncoder::setPosition);
+    builder.addDoubleProperty(
+        "Arm Position (deg)", armEncoder::getPosition, armEncoder::setPosition);
+    builder.addDoubleProperty("Arm Vel (deg/s)", armEncoder::getVelocity, null);
+
+    builder.addBooleanProperty(
+        "At desired position",
+        () -> {
+          return atPosition(desiredPosition);
+        },
+        null);
+    builder.addBooleanProperty("At desired arm position", this::atDesiredArmPosition, null);
+    
+    builder.addStringProperty(
+        "Desired position",
+        () -> {
+          return desiredPosition.toString();
+        },
+        null);
+    builder.addStringProperty(
+        "Latest position",
+        () -> {
+          return latestPosition.toString();
+        },
+        null);
+    builder.addStringProperty(
+        "Goal position",
+        () -> {
+          return goalPosition.toString();
+        },
+        null);
+    builder.addDoubleProperty("Arm output", armMotor::get, null);
+    builder.addStringProperty(
+        "Score Loc Height",
+        () -> {
+          return scoreLoc.getScoreHeight().toString();
+        },
+        null);
+    
+    builder.addStringProperty(
+        "Score Loc Col",
+        () -> {
+          return scoreLoc.getScoreCol().toString();
+        },
+        null);
+    
+    builder.addBooleanProperty(
+        "Arm encoder connected", armAbsoluteEncoderChecker::encoderConnected, null);
   }
 }
