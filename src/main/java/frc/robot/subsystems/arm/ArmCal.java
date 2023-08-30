@@ -8,6 +8,8 @@ public class ArmCal {
     public static final double ARM_P = PLACEHOLDER_DOUBLE;
     public static final double ARM_I = PLACEHOLDER_DOUBLE;
     public static final double ARM_D = PLACEHOLDER_DOUBLE;
+    public static final double ARM_MAX_VELOCITY_DEG_PER_SECOND = PLACEHOLDER_DOUBLE;
+    public static final double ARM_MAX_ACCELERATION_DEG_PER_SECOND_SQUARED = PLACEHOLDER_DOUBLE;
 
     // Arm positions in degrees for the armPositionMap
     public static final double ARM_START_POSITION_DEG = 180.0;
@@ -28,7 +30,6 @@ public class ArmCal {
     public static final double ARM_MARGIN_DEGREES = PLACEHOLDER_DOUBLE, ARM_START_MARGIN_DEGREES = PLACEHOLDER_DOUBLE;
 
     /** Input deg/s, output volts. From recalc */
-    /** TODO change because this is from last year's code? */
     public static final SimpleMotorFeedforward ARM_FEEDFORWARD =
         new SimpleMotorFeedforward(
             0.0, 1.5 * (2.0 * Math.PI) / 360.0, 0.08 * (2.0 * Math.PI) / 360.0);

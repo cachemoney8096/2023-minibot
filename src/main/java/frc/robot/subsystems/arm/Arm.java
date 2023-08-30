@@ -13,6 +13,8 @@ import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.CANSparkMax.ControlType;
 import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
+
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -36,8 +38,6 @@ public class Arm extends SubsystemBase {
   public CANSparkMax armMotor =
       new CANSparkMax(RobotMap.ARM_PIVOT_MOTOR_CAN_ID, MotorType.kBrushless);
 
-  public SparkMaxPIDController armController;
-
   private final RelativeEncoder armEncoder = armMotor.getEncoder();
   private final AbsoluteEncoder armAbsoluteEncoder = armMotor.getAbsoluteEncoder(Type.kDutyCycle);
 
@@ -52,12 +52,17 @@ public class Arm extends SubsystemBase {
 
   TreeMap<ArmPosition, Double> armPositionMap;
 
-  public Arm(ScoringLocationUtil scoreLoc) {
+  /** Input deg, output Volts */
+  private ProfiledPIDController armController =
+  new ProfiledPIDController(
+      ArmCal.ARM_P,
+      ArmCal.ARM_I,
+      ArmCal.ARM_D,
+      new TrapezoidProfile.Constraints(
+          ArmCal.ARM_MAX_VELOCITY_DEG_PER_SECOND,
+          ArmCal.ARM_MAX_ACCELERATION_DEG_PER_SECOND_SQUARED));
 
-    armController = armMotor.getPIDController();
-    armController.setP(ArmCal.ARM_P);
-    armController.setI(ArmCal.ARM_I);
-    armController.setD(ArmCal.ARM_D);
+  public Arm(ScoringLocationUtil scoreLoc) {
 
     armPositionMap = new TreeMap<ArmPosition, Double>();
     armPositionMap.put(ArmPosition.STARTING, ArmCal.ARM_START_POSITION_DEG);
@@ -163,12 +168,11 @@ public class Arm extends SubsystemBase {
       goalPosition = pos;
     }
 
-    // TODO check units
-    armController.setReference(armPositionMap.get(pos), ControlType.kPosition);
+    armController.setGoal(armPositionMap.get(pos));
 
     double armDemandVoltsA = armController.calculate(armEncoder.getPosition());
     double armDemandVoltsB =
-        ArmCal.ARM_FEEDFORWARD.calculate(armController.getReference().velocity);
+        ArmCal.ARM_FEEDFORWARD.calculate(armController.getSetpoint().velocity);
     double armDemandVoltsC = ArmCal.ARBITRARY_ARM_FEED_FORWARD_VOLTS * getCosineArmAngle();
     armMotor.setVoltage(armDemandVoltsA + armDemandVoltsB + armDemandVoltsC);
 
