@@ -44,9 +44,10 @@ public class Lights extends SubsystemBase {
     } else {
       currentLightStatus = light;
     }
+    setLEDs();
   }
-  public void setLEDs(LightCode light) {
-    currentLightStatus = light;
+
+  public void setLEDs() {
     candle.setLEDs(
       lightOptionsMap.get(currentLightStatus)[0], 
       lightOptionsMap.get(currentLightStatus)[1], 
