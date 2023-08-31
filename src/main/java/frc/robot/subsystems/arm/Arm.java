@@ -54,8 +54,6 @@ public class Arm extends SubsystemBase {
   private boolean cancelScore = false;
   private boolean scoringInProgress = false;
 
-  private AbsoluteEncoderChecker armAbsoluteEncoderChecker = new AbsoluteEncoderChecker();
-
   TreeMap<ArmPosition, Double> armPositionMap;
 
   /** Input deg, output Volts */
@@ -94,7 +92,6 @@ public class Arm extends SubsystemBase {
     }
 
     controlPosition(desiredPosition);
-    armAbsoluteEncoderChecker.addReading(armAbsoluteEncoder.getPosition());
   }
 
   /** Sets the desired position */
@@ -139,10 +136,7 @@ public class Arm extends SubsystemBase {
             : ArmCal.ARM_MARGIN_DEGREES;
     double armPositionToCheckDegrees = armPositionMap.get(desiredPosition);
     double armPositionDegrees = armEncoder.getPosition();
-    if (Math.abs(armPositionDegrees - armPositionToCheckDegrees) > armMarginDegrees) {
-      return false;
-    }
-    return true;
+    return Math.abs(armPositionDegrees - armPositionToCheckDegrees) <= armMarginDegrees;
   }
 
   /** True if the lift is at the queried position. */
@@ -155,10 +149,7 @@ public class Arm extends SubsystemBase {
     double armPositionToCheckDegrees = armPositionMap.get(positionToCheck);
     double armPositionDegrees = armEncoder.getPosition();
 
-    if (Math.abs(armPositionDegrees - armPositionToCheckDegrees) > armMarginDegrees) {
-      return false;
-    }
-    return true;
+    return Math.abs(armPositionDegrees - armPositionToCheckDegrees) <= armMarginDegrees;
   }
 
   /** Returns the cosine of the arm angle in degrees off of the horizontal. */
@@ -238,7 +229,7 @@ public class Arm extends SubsystemBase {
     System.out.println("New Zero for Arm: " + ArmCal.ARM_ABSOLUTE_ENCODER_ZERO_POS_DEG);
   }
 
-  private REVLibError setDegreesFromGearRatio(
+  public REVLibError setDegreesFromGearRatioAbsoluteEncoder (
         AbsoluteEncoder sparkMaxEncoder, double ratio) {
       double degreesPerRotation = 360.0 / ratio;
       double degreesPerRotationPerSecond = degreesPerRotation / 60.0;
@@ -251,7 +242,7 @@ public class Arm extends SubsystemBase {
       return sparkMaxEncoder.setVelocityConversionFactor(degreesPerRotationPerSecond);
     }
 
-    public static REVLibError setDegreesFromGearRatio(
+    public static REVLibError setDegreesFromGearRatioRelativeEncoder (
         RelativeEncoder sparkMaxEncoder, double ratio) {
       double degreesPerRotation = 360.0 / ratio;
       double degreesPerRotationPerSecond = degreesPerRotation / 60.0;
@@ -274,10 +265,10 @@ public class Arm extends SubsystemBase {
     armMotor.setInverted(false);
 
     // Get positions and degrees of elevator through encoder in inches
-    setDegreesFromGearRatio(
+    setDegreesFromGearRatioRelativeEncoder(
                 armEncoder, ArmConstants.ARM_MOTOR_GEAR_RATIO);
 
-    setDegreesFromGearRatio(armAbsoluteEncoder, 1.0);
+    setDegreesFromGearRatioAbsoluteEncoder(armAbsoluteEncoder, 1.0);
 
     armMotor.setSoftLimit(
                 SoftLimitDirection.kForward, ArmCal.ARM_POSITIVE_LIMIT_DEGREES);
@@ -355,8 +346,5 @@ public class Arm extends SubsystemBase {
           return scoreLoc.getScoreCol().toString();
         },
         null);
-    
-    builder.addBooleanProperty(
-        "Arm encoder connected", armAbsoluteEncoderChecker::encoderConnected, null);
   }
 }
