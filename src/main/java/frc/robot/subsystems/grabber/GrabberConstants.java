@@ -1,3 +1,3 @@
 package frc.robot.subsystems.grabber;
 
-public final class GrabberConstants{}
+public final class GrabberConstants {}
