@@ -21,5 +21,5 @@ public class RobotMap {
       BACK_INTAKE_ROLLER_MOTOR_CAN_ID = 11;
 
   /** CANdle for the lights */
-  public static final int CANDLE_CAN_ID = 12;
+  public final int CANDLE_CAN_ID = 12;
 }
