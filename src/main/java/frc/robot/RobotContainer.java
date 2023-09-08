@@ -8,12 +8,12 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.ClawLimelight;
-import frc.robot.subsystems.Grabber;
 import frc.robot.subsystems.Lights;
 import frc.robot.subsystems.TagLimelight;
 import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.utils.ScoringLocationUtil;
+import frc.robot.subsystems.grabber.Grabber;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a

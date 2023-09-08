@@ -1,5 +1,3 @@
 package frc.robot;
 
-public final class Calibrations {
-    
-}
+public final class Calibrations {}
