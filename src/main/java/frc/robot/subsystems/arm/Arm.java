@@ -4,32 +4,27 @@
 
 package frc.robot.subsystems.arm;
 
-import java.util.TreeMap;
-
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.CANSparkMax;
-import com.revrobotics.REVLibError;
-import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-import com.revrobotics.RelativeEncoder;
-import com.revrobotics.SparkMaxPIDController;
-import com.revrobotics.CANSparkMax.ControlType;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMax.SoftLimitDirection;
+import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.revrobotics.REVLibError;
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
-
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.util.sendable.SendableBuilder;
-import frc.robot.utils.SendableHelper;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotMap;
-import frc.robot.utils.AbsoluteEncoderChecker;
 import frc.robot.utils.ScoringLocationUtil;
 import frc.robot.utils.ScoringLocationUtil.ScoreHeight;
+import frc.robot.utils.SendableHelper;
+import java.util.TreeMap;
 
 public class Arm extends SubsystemBase {
 
@@ -58,13 +53,13 @@ public class Arm extends SubsystemBase {
 
   /** Input deg, output Volts */
   private ProfiledPIDController armController =
-  new ProfiledPIDController(
-      ArmCal.ARM_P,
-      ArmCal.ARM_I,
-      ArmCal.ARM_D,
-      new TrapezoidProfile.Constraints(
-          ArmCal.ARM_MAX_VELOCITY_DEG_PER_SECOND,
-          ArmCal.ARM_MAX_ACCELERATION_DEG_PER_SECOND_SQUARED));
+      new ProfiledPIDController(
+          ArmCal.ARM_P,
+          ArmCal.ARM_I,
+          ArmCal.ARM_D,
+          new TrapezoidProfile.Constraints(
+              ArmCal.ARM_MAX_VELOCITY_DEG_PER_SECOND,
+              ArmCal.ARM_MAX_ACCELERATION_DEG_PER_SECOND_SQUARED));
 
   public Arm(ScoringLocationUtil scoreLoc) {
 
@@ -73,10 +68,9 @@ public class Arm extends SubsystemBase {
     armPositionMap.put(ArmPosition.INTAKE, ArmCal.ARM_INTAKE_POSITION_DEG);
     armPositionMap.put(ArmPosition.SCORE_LOW, ArmCal.ARM_LOW_POSITION_DEG);
     armPositionMap.put(ArmPosition.SCORE_MID_HIGH, ArmCal.ARM_HIGH_MID_POSITION_DEG);
-    armPositionMap.put(
-        ArmPosition.AVOID_LIMELIGHT, ArmCal.ARM_AVOID_LIMELIGHT_POSITION_DEG);
+    armPositionMap.put(ArmPosition.AVOID_LIMELIGHT, ArmCal.ARM_AVOID_LIMELIGHT_POSITION_DEG);
 
-  this.scoreLoc = scoreLoc;
+    this.scoreLoc = scoreLoc;
   }
 
   public void initialize() {}
@@ -101,10 +95,11 @@ public class Arm extends SubsystemBase {
 
   public void startScore() {
     scoringInProgress = true;
-    if (scoreLoc.getScoreHeight() == ScoreHeight.HIGH || scoreLoc.getScoreHeight() == ScoreHeight.MID) {
+    if (scoreLoc.getScoreHeight() == ScoreHeight.HIGH
+        || scoreLoc.getScoreHeight() == ScoreHeight.MID) {
       setDesiredPosition(ArmPosition.SCORE_MID_HIGH);
     } else if (scoreLoc.getScoreHeight() == ScoreHeight.LOW) {
-        setDesiredPosition(ArmPosition.SCORE_LOW);
+      setDesiredPosition(ArmPosition.SCORE_LOW);
     }
   }
 
@@ -145,7 +140,7 @@ public class Arm extends SubsystemBase {
         positionToCheck == ArmPosition.STARTING
             ? ArmCal.ARM_START_MARGIN_DEGREES
             : ArmCal.ARM_MARGIN_DEGREES;
-            
+
     double armPositionToCheckDegrees = armPositionMap.get(positionToCheck);
     double armPositionDegrees = armEncoder.getPosition();
 
@@ -159,8 +154,8 @@ public class Arm extends SubsystemBase {
             armEncoder.getPosition() - ArmConstants.ARM_POSITION_WHEN_HORIZONTAL_DEGREES));
   }
 
-   /** Sends voltage commands to the arm and elevator motors, needs to be called every cycle */
-   private void controlPosition(ArmPosition pos) {
+  /** Sends voltage commands to the arm and elevator motors, needs to be called every cycle */
+  private void controlPosition(ArmPosition pos) {
     if (goalPosition != pos) {
       goalPosition = pos;
     }
@@ -168,8 +163,7 @@ public class Arm extends SubsystemBase {
     armController.setGoal(armPositionMap.get(pos));
 
     double armDemandVoltsA = armController.calculate(armEncoder.getPosition());
-    double armDemandVoltsB =
-        ArmCal.ARM_FEEDFORWARD.calculate(armController.getSetpoint().velocity);
+    double armDemandVoltsB = ArmCal.ARM_FEEDFORWARD.calculate(armController.getSetpoint().velocity);
     double armDemandVoltsC = ArmCal.ARBITRARY_ARM_FEED_FORWARD_VOLTS * getCosineArmAngle();
     armMotor.setVoltage(armDemandVoltsA + armDemandVoltsB + armDemandVoltsC);
 
@@ -179,8 +173,8 @@ public class Arm extends SubsystemBase {
   }
 
   /**
-   * if the robot has completed startScore() but hasn't started finishScore, then stop the robot from
-   * scoring
+   * if the robot has completed startScore() but hasn't started finishScore, then stop the robot
+   * from scoring
    */
   public void cancelScore() {
     if (scoringInProgress) {
@@ -229,31 +223,31 @@ public class Arm extends SubsystemBase {
     System.out.println("New Zero for Arm: " + ArmCal.ARM_ABSOLUTE_ENCODER_ZERO_POS_DEG);
   }
 
-  public REVLibError setDegreesFromGearRatioAbsoluteEncoder (
-        AbsoluteEncoder sparkMaxEncoder, double ratio) {
-      double degreesPerRotation = 360.0 / ratio;
-      double degreesPerRotationPerSecond = degreesPerRotation / 60.0;
-      REVLibError error = sparkMaxEncoder.setPositionConversionFactor(degreesPerRotation);
+  public REVLibError setDegreesFromGearRatioAbsoluteEncoder(
+      AbsoluteEncoder sparkMaxEncoder, double ratio) {
+    double degreesPerRotation = 360.0 / ratio;
+    double degreesPerRotationPerSecond = degreesPerRotation / 60.0;
+    REVLibError error = sparkMaxEncoder.setPositionConversionFactor(degreesPerRotation);
 
-      if (error != REVLibError.kOk) {
-        return error;
-      }
-
-      return sparkMaxEncoder.setVelocityConversionFactor(degreesPerRotationPerSecond);
+    if (error != REVLibError.kOk) {
+      return error;
     }
 
-    public static REVLibError setDegreesFromGearRatioRelativeEncoder (
-        RelativeEncoder sparkMaxEncoder, double ratio) {
-      double degreesPerRotation = 360.0 / ratio;
-      double degreesPerRotationPerSecond = degreesPerRotation / 60.0;
-      REVLibError error = sparkMaxEncoder.setPositionConversionFactor(degreesPerRotation);
+    return sparkMaxEncoder.setVelocityConversionFactor(degreesPerRotationPerSecond);
+  }
 
-      if (error != REVLibError.kOk) {
-        return error;
-      }
+  public static REVLibError setDegreesFromGearRatioRelativeEncoder(
+      RelativeEncoder sparkMaxEncoder, double ratio) {
+    double degreesPerRotation = 360.0 / ratio;
+    double degreesPerRotationPerSecond = degreesPerRotation / 60.0;
+    REVLibError error = sparkMaxEncoder.setPositionConversionFactor(degreesPerRotation);
 
-      return sparkMaxEncoder.setVelocityConversionFactor(degreesPerRotationPerSecond);
+    if (error != REVLibError.kOk) {
+      return error;
     }
+
+    return sparkMaxEncoder.setVelocityConversionFactor(degreesPerRotationPerSecond);
+  }
 
   /** Does all the initialization for the sparks */
   private void initSparks() {
@@ -265,18 +259,15 @@ public class Arm extends SubsystemBase {
     armMotor.setInverted(false);
 
     // Get positions and degrees of elevator through encoder in inches
-    setDegreesFromGearRatioRelativeEncoder(
-                armEncoder, ArmConstants.ARM_MOTOR_GEAR_RATIO);
+    setDegreesFromGearRatioRelativeEncoder(armEncoder, ArmConstants.ARM_MOTOR_GEAR_RATIO);
 
     setDegreesFromGearRatioAbsoluteEncoder(armAbsoluteEncoder, 1.0);
 
-    armMotor.setSoftLimit(
-                SoftLimitDirection.kForward, ArmCal.ARM_POSITIVE_LIMIT_DEGREES);
+    armMotor.setSoftLimit(SoftLimitDirection.kForward, ArmCal.ARM_POSITIVE_LIMIT_DEGREES);
 
     armMotor.enableSoftLimit(SoftLimitDirection.kForward, true);
 
-    armMotor.setSoftLimit(
-                SoftLimitDirection.kReverse, ArmCal.ARM_NEGATIVE_LIMIT_DEGREES);
+    armMotor.setSoftLimit(SoftLimitDirection.kReverse, ArmCal.ARM_NEGATIVE_LIMIT_DEGREES);
 
     armMotor.enableSoftLimit(SoftLimitDirection.kReverse, true);
 
@@ -298,7 +289,6 @@ public class Arm extends SubsystemBase {
   public void initSendable(SendableBuilder builder) {
     super.initSendable(builder);
     SendableHelper.addChild(builder, this, armController, "ArmController");
-    
 
     builder.addDoubleProperty(
         "Arm Abs Position (deg)", armAbsoluteEncoder::getPosition, armEncoder::setPosition);
@@ -313,7 +303,7 @@ public class Arm extends SubsystemBase {
         },
         null);
     builder.addBooleanProperty("At desired arm position", this::atDesiredArmPosition, null);
-    
+
     builder.addStringProperty(
         "Desired position",
         () -> {
@@ -339,7 +329,7 @@ public class Arm extends SubsystemBase {
           return scoreLoc.getScoreHeight().toString();
         },
         null);
-    
+
     builder.addStringProperty(
         "Score Loc Col",
         () -> {

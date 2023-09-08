@@ -12,8 +12,8 @@ import frc.robot.subsystems.Lights;
 import frc.robot.subsystems.TagLimelight;
 import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.drive.DriveSubsystem;
-import frc.robot.utils.ScoringLocationUtil;
 import frc.robot.subsystems.grabber.Grabber;
+import frc.robot.utils.ScoringLocationUtil;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -37,8 +37,6 @@ public class RobotContainer {
   public RobotContainer() {
     // Configure the trigger bindings
     configureBindings();
-
-    
   }
 
   /**
