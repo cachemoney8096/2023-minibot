@@ -4,14 +4,16 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.ClawLimelight;
 import frc.robot.subsystems.Lights;
 import frc.robot.subsystems.TagLimelight;
+import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.grabber.Grabber;
+import frc.robot.utils.ScoringLocationUtil;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -21,7 +23,8 @@ import frc.robot.subsystems.grabber.Grabber;
  */
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
-  private Arm arm = new Arm();
+  private final ScoringLocationUtil scoreLoc = new ScoringLocationUtil();
+  private Arm arm = new Arm(scoreLoc);
   private ClawLimelight clawLimelight = new ClawLimelight();
   private Grabber grabber = new Grabber();
   private Lights lights = new Lights();
@@ -34,6 +37,22 @@ public class RobotContainer {
   public RobotContainer() {
     // Configure the trigger bindings
     configureBindings();
+  }
+
+  /**
+   * Run burnFlash() for all controllers initialized. The ideal use case for this call is to call it
+   * once everything has been initialized. The burnFlash() call has the side effect of preventing
+   * all communication *to* the device for up to 200ms or more, potentially including some messages
+   * called before the burnFlash() call, and receiving messages *from* the device.
+   *
+   * <p>WARNING: This call will sleep the thread before and after burning flash. This is for your
+   * safety.
+   *
+   * <p>Borrowed from 3005.
+   */
+  public void burnFlashSparks() {
+    Timer.delay(0.25);
+    arm.burnFlashSparks();
   }
 
   /**
