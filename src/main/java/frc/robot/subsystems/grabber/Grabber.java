@@ -2,6 +2,8 @@ package frc.robot.subsystems.grabber;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+
+import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotMap;
 
@@ -43,5 +45,10 @@ public class Grabber extends SubsystemBase {
   }
 
   @Override
+  public void initSendable(SendableBuilder builder) {
+    super.initSendable(builder);
+    builder.addDoubleProperty("Front Motor Set Speed", frontMotor::get, frontMotor::set);
+    builder.addDoubleProperty("Back Motor Set Speed", backMotor::get, backMotor::set);
+  }
   public void periodic() {}
 }
