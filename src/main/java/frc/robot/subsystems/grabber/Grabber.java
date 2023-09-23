@@ -2,7 +2,6 @@ package frc.robot.subsystems.grabber;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -16,8 +15,9 @@ public class Grabber extends SubsystemBase {
   private CANSparkMax backMotor =
       new CANSparkMax(RobotMap.BACK_INTAKE_ROLLER_MOTOR_CAN_ID, MotorType.kBrushless);
 
-  private final DigitalInput gamePieceSensor = new DigitalInput(RobotMap.GRABBER_GAME_PIECE_SENSOR_DIO);
-  
+  private final DigitalInput gamePieceSensor =
+      new DigitalInput(RobotMap.GRABBER_GAME_PIECE_SENSOR_DIO);
+
   public void spinMotors(double power) {
     frontMotor.set(power);
     backMotor.set(power);
@@ -47,7 +47,7 @@ public class Grabber extends SubsystemBase {
     spinMotors(0.0);
   }
 
-  public boolean seeGamePiece(){
+  public boolean seeGamePiece() {
     return !gamePieceSensor.get();
   }
 
@@ -58,5 +58,6 @@ public class Grabber extends SubsystemBase {
     builder.addDoubleProperty("Back Motor Set Speed", backMotor::get, backMotor::set);
     builder.addBooleanProperty("Sensor sees game piece", this::seeGamePiece, null);
   }
+
   public void periodic() {}
 }
