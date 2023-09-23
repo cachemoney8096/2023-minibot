@@ -54,6 +54,6 @@ public final class Constants {
     public static final boolean TURNING_SPARK_MAX_INVERTED = false;
     public static final boolean DRIVING_SPARK_MAX_INVERTED = true;
 
-    public static final double TURNING_ENCODER_GEAR_RATIO = 1.0;
+    public static final double TURNING_ENCODER_GEAR_RATIO = 46.2;
   }
 }
