@@ -28,11 +28,11 @@ public final class Constants {
   public static final class SwerveModule {
     public static final boolean TURNING_ENCODER_INVERTED = true;
 
-    public static final double WHEEL_DIAMETER_FUDGE_FACTOR = 0.898 * 1.120 * 0.992 * 1.035;
+    public static final double WHEEL_DIAMETER_FUDGE_FACTOR = 1.0;
     
     public static final double WHEEL_DIAMETER_METERS = Units.inchesToMeters(3) * WHEEL_DIAMETER_FUDGE_FACTOR,
         WHEEL_CIRCUMFERENCE_METERS = WHEEL_DIAMETER_METERS * Math.PI;
-    public static final double DRIVING_MOTOR_REDUCTION = 4.8;
+    public static final double DRIVING_MOTOR_REDUCTION = 4.71;
     /** Meters */
     public static final double DRIVING_ENCODER_POSITION_FACTOR_METERS =
         WHEEL_CIRCUMFERENCE_METERS / DRIVING_MOTOR_REDUCTION; 
