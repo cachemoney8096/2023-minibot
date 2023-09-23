@@ -33,7 +33,10 @@ public class SwerveModule implements Sendable {
   private final SparkMaxPIDController turningPIDController;
 
   private double chassisAngularOffsetRadians = 0.0;
-  private SwerveModuleState desiredState = new SwerveModuleState(Constants.SwerveModule.DRIVING_ENCODER_VELOCITY_FACTOR_METERS_PER_SECOND, new Rotation2d());
+  private SwerveModuleState desiredState =
+      new SwerveModuleState(
+          Constants.SwerveModule.DRIVING_ENCODER_VELOCITY_FACTOR_METERS_PER_SECOND,
+          new Rotation2d());
 
   /**
    * Constructs a SwerveModule and configures the driving and turning motor, encoder, and PID
@@ -65,8 +68,9 @@ public class SwerveModule implements Sendable {
     turningPidTmp.setFeedbackDevice(turningEncoderTmp);
 
     /*  Gear ratio 1.0 because the encoder is 1:1 with the module (doesn't involve the actual turning
-  / gear ratio)*/
-    SparkMaxUtils.UnitConversions.setRadsFromGearRatio(turningEncoderTmp, Constants.SwerveModule.TURNING_ENCODER_GEAR_RATIO);
+    / gear ratio)*/
+    SparkMaxUtils.UnitConversions.setRadsFromGearRatio(
+        turningEncoderTmp, Constants.SwerveModule.TURNING_ENCODER_GEAR_RATIO);
     turningEncoderTmp.setInverted(Constants.SwerveModule.TURNING_ENCODER_INVERTED);
     turningPidTmp.setPositionPIDWrappingEnabled(true);
     turningPidTmp.setPositionPIDWrappingMinInput(
@@ -81,12 +85,10 @@ public class SwerveModule implements Sendable {
     turningPidTmp.setOutputRange(
         Calibrations.SwerveModule.TURNING_MIN_OUTPUT, Calibrations.SwerveModule.TURNING_MAX_OUTPUT);
     turningSparkMax.setIdleMode(Constants.SwerveModule.TURNING_MOTOR_IDLE_MODE);
-    turningSparkMax.setSmartCurrentLimit(
-        Constants.SwerveModule.TURNING_MOTOR_CURRENT_LIMIT_AMPS);
-
+    turningSparkMax.setSmartCurrentLimit(Constants.SwerveModule.TURNING_MOTOR_CURRENT_LIMIT_AMPS);
   }
 
-  /** Does all the initialization for the spark*/
+  /** Does all the initialization for the spark */
   void initDriveSpark() {
     drivingSparkMax.restoreFactoryDefaults();
 
@@ -108,8 +110,7 @@ public class SwerveModule implements Sendable {
         Constants.SwerveModule.DRIVING_ENCODER_VELOCITY_FACTOR_METERS_PER_SECOND);
 
     drivingSparkMax.setIdleMode(Constants.SwerveModule.DRIVING_MOTOR_IDLE_MODE);
-    drivingSparkMax.setSmartCurrentLimit(
-        Constants.SwerveModule.DRIVING_MOTOR_CURRENT_LIMIT_AMPS);
+    drivingSparkMax.setSmartCurrentLimit(Constants.SwerveModule.DRIVING_MOTOR_CURRENT_LIMIT_AMPS);
   }
 
   /**
@@ -173,7 +174,8 @@ public class SwerveModule implements Sendable {
   /** Zeroes all the SwerveModule encoders. */
   public void resetDrivingEncoders() {
     drivingEncoder.setPosition(0);
-;  }
+    ;
+  }
 
   public double getTurningEncoderAbsPositionRad() {
     return turningEncoder.getPosition();

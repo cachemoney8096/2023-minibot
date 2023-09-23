@@ -3,6 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 package frc.robot;
+
 import com.revrobotics.CANSparkMax.IdleMode;
 import edu.wpi.first.math.util.Units;
 
@@ -19,7 +20,6 @@ public final class Constants {
   public static final double PLACEHOLDER_DOUBLE = 0.0;
   public static final float PLACEHOLDER_FLOAT = 0;
 
-
   public static final int DRIVER_CONTROLLER_PORT = 0;
   public static final int OPERATOR_CONTROLLER_PORT = 1;
 
@@ -29,20 +29,21 @@ public final class Constants {
     public static final boolean TURNING_ENCODER_INVERTED = true;
 
     public static final double WHEEL_DIAMETER_FUDGE_FACTOR = 1.0;
-    
-    public static final double WHEEL_DIAMETER_METERS = Units.inchesToMeters(3) * WHEEL_DIAMETER_FUDGE_FACTOR,
+
+    public static final double
+        WHEEL_DIAMETER_METERS = Units.inchesToMeters(3) * WHEEL_DIAMETER_FUDGE_FACTOR,
         WHEEL_CIRCUMFERENCE_METERS = WHEEL_DIAMETER_METERS * Math.PI;
     public static final double DRIVING_MOTOR_REDUCTION = 4.71;
     /** Meters */
     public static final double DRIVING_ENCODER_POSITION_FACTOR_METERS =
-        WHEEL_CIRCUMFERENCE_METERS / DRIVING_MOTOR_REDUCTION; 
+        WHEEL_CIRCUMFERENCE_METERS / DRIVING_MOTOR_REDUCTION;
     /** Meters per second */
     public static final double DRIVING_ENCODER_VELOCITY_FACTOR_METERS_PER_SECOND =
-        DRIVING_ENCODER_POSITION_FACTOR_METERS / 60.0; 
+        DRIVING_ENCODER_POSITION_FACTOR_METERS / 60.0;
 
     public static final IdleMode DRIVING_MOTOR_IDLE_MODE = IdleMode.kCoast;
-    public static final IdleMode TURNING_MOTOR_IDLE_MODE = IdleMode.kBrake; 
-    
+    public static final IdleMode TURNING_MOTOR_IDLE_MODE = IdleMode.kBrake;
+
     public static final int DRIVING_MOTOR_CURRENT_LIMIT_AMPS = 50;
 
     public static final double TURNING_ENCODER_POSITION_PID_MIN_INPUT_RADIANS = 0; // radians
