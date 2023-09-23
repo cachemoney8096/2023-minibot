@@ -171,7 +171,7 @@ public class SwerveModule implements Sendable {
   }
 
   /** Zeroes all the SwerveModule encoders. */
-  public void resetEncoders() {
+  public void resetDrivingEncoders() {
     drivingEncoder.setPosition(0);
 ;  }
 

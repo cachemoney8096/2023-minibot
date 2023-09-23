@@ -6,9 +6,6 @@ import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.REVLibError;
 
 public class SparkMaxUtils {
-    public static final int check(REVLibError error) {
-        return error == REVLibError.kOk ? 0 : 1;
-    }
 
     public static class UnitConversions {
         public static void setRadsFromGearRatio(AbsoluteEncoder sparkMaxEncoder, double ratio) {
