@@ -16,7 +16,7 @@ public class Grabber extends SubsystemBase {
   private CANSparkMax backMotor =
       new CANSparkMax(RobotMap.BACK_INTAKE_ROLLER_MOTOR_CAN_ID, MotorType.kBrushless);
 
-  private final DigitalInput gamePieceSensor = new DigitalInput(RobotMap.LIFT_GAME_PIECE_DIO);
+  private final DigitalInput gamePieceSensor = new DigitalInput(RobotMap.GRABBER_GAME_PIECE_SENSOR_DIO);
   
   public void spinMotors(double power) {
     frontMotor.set(power);
@@ -48,8 +48,7 @@ public class Grabber extends SubsystemBase {
   }
 
   public boolean seeGamePiece(){
-    boolean seeGamePieceNow = !gamePieceSensor.get();
-    return seeGamePieceNow;
+    return !gamePieceSensor.get();
   }
 
   @Override

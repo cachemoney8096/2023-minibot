@@ -24,5 +24,5 @@ public class RobotMap {
   public static final int CANDLE_CAN_ID = 12;
 
   /** Channel for the game piece sensor */
-  public static final int LIFT_GAME_PIECE_DIO = Constants.PLACEHOLDER_INT;
+  public static final int GRABBER_GAME_PIECE_SENSOR_DIO = Constants.PLACEHOLDER_INT;
 }
