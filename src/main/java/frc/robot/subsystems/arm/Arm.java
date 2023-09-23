@@ -124,7 +124,7 @@ public class Arm extends SubsystemBase {
   }
 
   /** True if the arm is at the current value of this.desiredPosition */
-  private boolean atDesiredArmPosition() {
+  public boolean atDesiredArmPosition() {
     double armMarginDegrees =
         desiredPosition == ArmPosition.STARTING
             ? ArmCal.ARM_START_MARGIN_DEGREES
@@ -134,7 +134,7 @@ public class Arm extends SubsystemBase {
     return Math.abs(armPositionDegrees - armPositionToCheckDegrees) <= armMarginDegrees;
   }
 
-  /** True if the lift is at the queried position. */
+  /** True if the arm is at the queried position. */
   public boolean atPosition(ArmPosition positionToCheck) {
     double armMarginDegrees =
         positionToCheck == ArmPosition.STARTING
