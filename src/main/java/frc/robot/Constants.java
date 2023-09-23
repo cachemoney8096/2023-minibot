@@ -28,8 +28,10 @@ public final class Constants {
   public static final class SwerveModule {
     public static final boolean TURNING_ENCODER_INVERTED = true;
 
-    public static final double DRIVING_ENCODER_POSITION_FACTOR_METERS = PLACEHOLDER_DOUBLE; // meters
-    public static final double DRIVING_ENCODER_VELOCITY_FACTOR_METERS_PER_SECOND = PLACEHOLDER_DOUBLE; // meters per second
+    /* Meters */
+    public static final double DRIVING_ENCODER_POSITION_FACTOR_METERS = PLACEHOLDER_DOUBLE;
+    /* Meters per second */
+    public static final double DRIVING_ENCODER_VELOCITY_FACTOR_METERS_PER_SECOND = PLACEHOLDER_DOUBLE;
 
     public static final IdleMode DRIVING_MOTOR_IDLE_MODE = IdleMode.kCoast;
     public static final IdleMode TURNING_MOTOR_IDLE_MODE = IdleMode.kBrake; 
@@ -42,6 +44,9 @@ public final class Constants {
 
     public static final int TURNING_MOTOR_CURRENT_LIMIT_AMPS = PLACEHOLDER_INT;
 
+    public static final boolean TURNING_SPARK_MAX_INVERTED = false;
+    public static final boolean DRIVING_SPARK_MAX_INVERTED = true;
 
+    public static final double TURNING_ENCODER_GEAR_RATIO = 1.0;
   }
 }

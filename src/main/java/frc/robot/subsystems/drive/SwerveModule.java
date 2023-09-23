@@ -32,8 +32,8 @@ public class SwerveModule implements Sendable {
   private final SparkMaxPIDController drivingPIDController;
   private final SparkMaxPIDController turningPIDController;
 
-  private double chassisAngularOffsetRadians = 0;
-  private SwerveModuleState desiredState = new SwerveModuleState(0.0, new Rotation2d());
+  private double chassisAngularOffsetRadians = 0.0;
+  private SwerveModuleState desiredState = new SwerveModuleState(Constants.SwerveModule.DRIVING_ENCODER_VELOCITY_FACTOR_METERS_PER_SECOND, new Rotation2d());
 
   /**
    * Constructs a SwerveModule and configures the driving and turning motor, encoder, and PID
@@ -58,15 +58,15 @@ public class SwerveModule implements Sendable {
   void initTurnSpark() {
 
     turningSparkMax.restoreFactoryDefaults();
-    turningSparkMax.setInverted(false);
+    turningSparkMax.setInverted(Constants.SwerveModule.TURNING_SPARK_MAX_INVERTED);
 
     AbsoluteEncoder turningEncoderTmp = turningSparkMax.getAbsoluteEncoder(Type.kDutyCycle);
     SparkMaxPIDController turningPidTmp = turningSparkMax.getPIDController();
     turningPidTmp.setFeedbackDevice(turningEncoderTmp);
 
-    // Gear ratio 1.0 because the encoder is 1:1 with the module (doesn't involve the actual turning
-    // gear ratio)
-    SparkMaxUtils.UnitConversions.setRadsFromGearRatio(turningEncoderTmp, 1.0);
+    /*  Gear ratio 1.0 because the encoder is 1:1 with the module (doesn't involve the actual turning
+  / gear ratio)*/
+    SparkMaxUtils.UnitConversions.setRadsFromGearRatio(turningEncoderTmp, Constants.SwerveModule.TURNING_ENCODER_GEAR_RATIO);
     turningEncoderTmp.setInverted(Constants.SwerveModule.TURNING_ENCODER_INVERTED);
     turningPidTmp.setPositionPIDWrappingEnabled(true);
     turningPidTmp.setPositionPIDWrappingMinInput(
@@ -90,7 +90,7 @@ public class SwerveModule implements Sendable {
   void initDriveSpark() {
     drivingSparkMax.restoreFactoryDefaults();
 
-    drivingSparkMax.setInverted(true);
+    drivingSparkMax.setInverted(Constants.SwerveModule.DRIVING_SPARK_MAX_INVERTED);
 
     RelativeEncoder drivingEncoderTmp = drivingSparkMax.getEncoder();
     SparkMaxPIDController drivingPidTmp = drivingSparkMax.getPIDController();
@@ -124,8 +124,6 @@ public class SwerveModule implements Sendable {
   }
 
   /**
-   * Returns the current state of the module.
-   *
    * @return The current state of the module.
    */
   public SwerveModuleState getState() {
@@ -137,8 +135,6 @@ public class SwerveModule implements Sendable {
   }
 
   /**
-   * Returns the current position of the module.
-   *
    * @return The current position of the module.
    */
   public SwerveModulePosition getPosition() {
@@ -150,8 +146,6 @@ public class SwerveModule implements Sendable {
   }
 
   /**
-   * Sets the desired state for the module.
-   *
    * @param desiredState Desired state with speed and angle.
    */
   public void setDesiredState(SwerveModuleState desiredState) {
@@ -179,9 +173,9 @@ public class SwerveModule implements Sendable {
   /** Zeroes all the SwerveModule encoders. */
   public void resetEncoders() {
     drivingEncoder.setPosition(0);
-  }
+;  }
 
-  public double getEncoderAbsPositionRad() {
+  public double getTurningEncoderAbsPositionRad() {
     return turningEncoder.getPosition();
   }
 
