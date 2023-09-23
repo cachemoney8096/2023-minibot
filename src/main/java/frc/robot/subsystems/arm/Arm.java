@@ -33,7 +33,8 @@ public class Arm extends SubsystemBase {
     INTAKE,
     SCORE_LOW,
     SCORE_MID_HIGH,
-    AVOID_LIMELIGHT
+    AVOID_LIMELIGHT,
+    OUTTAKE
   }
 
   public CANSparkMax armMotor =
@@ -69,6 +70,7 @@ public class Arm extends SubsystemBase {
     armPositionMap.put(ArmPosition.SCORE_LOW, ArmCal.ARM_LOW_POSITION_DEG);
     armPositionMap.put(ArmPosition.SCORE_MID_HIGH, ArmCal.ARM_HIGH_MID_POSITION_DEG);
     armPositionMap.put(ArmPosition.AVOID_LIMELIGHT, ArmCal.ARM_AVOID_LIMELIGHT_POSITION_DEG);
+    armPositionMap.put(ArmPosition.OUTTAKE, ArmCal.ARM_OUTTAKE_POSITION_DEG);
 
     this.scoreLoc = scoreLoc;
   }
@@ -216,6 +218,10 @@ public class Arm extends SubsystemBase {
     } else {
       setDesiredPosition(ArmPosition.SCORE_MID_HIGH);
     }
+  }
+
+  public ScoreHeight getScoreHeight() {
+    return scoreLoc.getScoreHeight();
   }
 
   public void zeroArmAtCurrentPos() {

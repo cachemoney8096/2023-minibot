@@ -27,23 +27,15 @@ public class Grabber extends SubsystemBase {
     spinMotors(GrabberCalibrations.INTAKING_POWER);
   }
 
-  public void scoreHigh() {
-    spinMotors(GrabberCalibrations.SCORE_HIGH_POWER);
-  }
-
-  public void scoreMid() {
-    spinMotors(GrabberCalibrations.SCORE_MID_POWER);
-  }
-
-  public void scoreLow() {
-    spinMotors(GrabberCalibrations.SCORE_LOW_POWER);
+  public void score(double scoringPower) {
+    spinMotors(scoringPower);
   }
 
   public void eject() {
     spinMotors(GrabberCalibrations.EJECTION_POWER);
   }
 
-  public void stopIntakingGamePiece() {
+  public void stopMotors() {
     spinMotors(0.0);
   }
 
