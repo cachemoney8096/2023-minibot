@@ -17,6 +17,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotMap;
 import frc.robot.utils.ScoringLocationUtil;
@@ -41,7 +42,10 @@ public class Arm extends SubsystemBase {
   private final RelativeEncoder armEncoder = armMotor.getEncoder();
   private final AbsoluteEncoder armAbsoluteEncoder = armMotor.getAbsoluteEncoder(Type.kDutyCycle);
 
+  private boolean scoringInProgress = false;
+  private boolean cancelScore = false;
   public ScoringLocationUtil scoreLoc;
+  private ArmPosition desiredPosition = ArmPosition.STARTING;
 
   TreeMap<ArmPosition, Double> armPositionMap;
 
@@ -70,16 +74,10 @@ public class Arm extends SubsystemBase {
 
   public void initialize() {}
 
-  @Override
-  // This method will be called once per scheduler run
-  public void periodic() {
-    // Check if position has updated
-    
-  }
-
   /** Sets the desired position */
 
   public void startScore() {
+    scoringInProgress = true;
     if (scoreLoc.getScoreHeight() == ScoreHeight.HIGH
         || scoreLoc.getScoreHeight() == ScoreHeight.MID) {
       goToPosition(ArmPosition.SCORE_MID_HIGH);
@@ -120,7 +118,25 @@ public class Arm extends SubsystemBase {
     SmartDashboard.putNumber("Arm Gravity", armDemandVoltsC);
   }
 
+  public void deployArmLessFar() {
+    Double curAngle = armPositionMap.get(desiredPosition);
+    Double newAngle = curAngle - 0.5;
+    armPositionMap.replace(desiredPosition, newAngle);
 
+    new PrintCommand("Latest angle for " + desiredPosition + ": " + newAngle);
+
+    armController.setGoal(newAngle);
+  }
+
+  public void deployArmFurther() {
+    Double curAngle = armPositionMap.get(desiredPosition);
+    Double newAngle = curAngle + 0.5;
+    armPositionMap.replace(desiredPosition, newAngle);
+
+    new PrintCommand("Latest angle for " + desiredPosition + ": " + newAngle);
+
+    armController.setGoal(newAngle);
+  }
   /**
    * takes the column and height from ScoringLocationUtil.java and converts that to a ArmPosition
    * then gives the position to the given arm
@@ -145,6 +161,37 @@ public class Arm extends SubsystemBase {
     System.out.println("New Zero for Arm: " + ArmCal.ARM_ABSOLUTE_ENCODER_ZERO_POS_DEG);
   }
 
+  /**
+   * if the robot has completed startScore() but hasn't started finishScore, then stop the robot
+   * from scoring
+   */
+  public void cancelScore() {
+    if (scoringInProgress) {
+      setCancelScore(true);
+    }
+  }
+
+  /** Runs instead of finishScore if cancelScore is true. */
+  public void finishScoreCancelled() {
+    setCancelScore(false);
+    ManualPrepScoreSequence();
+  }
+
+  /** returns cancelScore (true if scoring action is cancelled) */
+  public boolean getCancelScore() {
+    return this.cancelScore;
+  }
+
+  /** sets cancelScore (true if scoring action is cancelled) */
+  public void setCancelScore(boolean cancelled) {
+    this.cancelScore = cancelled;
+  }
+
+  /** sets scoringInProgress */
+  public void setScoringInProgress(boolean isScoring) {
+    scoringInProgress = isScoring;
+  }
+
   public void setDegreesFromGearRatioAbsoluteEncoder(
       AbsoluteEncoder sparkMaxEncoder, double ratio) {
     double degreesPerRotation = 360.0 / ratio;
@@ -159,6 +206,18 @@ public class Arm extends SubsystemBase {
     double degreesPerRotationPerSecond = degreesPerRotation / 60.0;
     sparkMaxEncoder.setPositionConversionFactor(degreesPerRotation);
     sparkMaxEncoder.setVelocityConversionFactor(degreesPerRotationPerSecond);
+  }
+
+  /** True if the arm is at the queried position. */
+
+  public boolean atDesiredArmPosition() {
+    double armMarginDegrees =
+        desiredPosition == ArmPosition.STARTING
+            ? ArmCal.ARM_START_MARGIN_DEGREES
+            : ArmCal.ARM_MARGIN_DEGREES;
+    double armPositionToCheckDegrees = armPositionMap.get(desiredPosition);
+    double armPositionDegrees = armEncoder.getPosition();
+    return Math.abs(armPositionDegrees - armPositionToCheckDegrees) <= armMarginDegrees;
   }
 
   /** Does all the initialization for the sparks */
@@ -216,6 +275,20 @@ public class Arm extends SubsystemBase {
         },
         null);
 
+        builder.addBooleanProperty(
+          "At desired position",
+          () -> {
+            return atPosition(desiredPosition);
+          },
+          null);
+      builder.addBooleanProperty("At desired arm position", this::atDesiredArmPosition, null);
+  
+      builder.addStringProperty(
+          "Desired position",
+          () -> {
+            return desiredPosition.toString();
+          },
+          null);
     builder.addStringProperty(
         "Score Loc Col",
         () -> {
