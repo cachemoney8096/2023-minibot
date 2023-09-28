@@ -42,11 +42,6 @@ public class Arm extends SubsystemBase {
   private final AbsoluteEncoder armAbsoluteEncoder = armMotor.getAbsoluteEncoder(Type.kDutyCycle);
 
   public ScoringLocationUtil scoreLoc;
-  private ArmPosition desiredPosition = ArmPosition.STARTING;
-  private ArmPosition latestPosition = ArmPosition.STARTING;
-  private ArmPosition goalPosition = ArmPosition.STARTING;
-  private boolean cancelScore = false;
-  private boolean scoringInProgress = false;
 
   TreeMap<ArmPosition, Double> armPositionMap;
 
@@ -85,7 +80,6 @@ public class Arm extends SubsystemBase {
   /** Sets the desired position */
 
   public void startScore() {
-    scoringInProgress = true;
     if (scoreLoc.getScoreHeight() == ScoreHeight.HIGH
         || scoreLoc.getScoreHeight() == ScoreHeight.MID) {
       goToPosition(ArmPosition.SCORE_MID_HIGH);
@@ -126,10 +120,6 @@ public class Arm extends SubsystemBase {
     SmartDashboard.putNumber("Arm Gravity", armDemandVoltsC);
   }
 
-  /** returns cancelScore (true if scoring action is cancelled) */
-  public boolean getCancelScore() {
-    return this.cancelScore;
-  }
 
   /**
    * takes the column and height from ScoringLocationUtil.java and converts that to a ArmPosition
@@ -218,31 +208,6 @@ public class Arm extends SubsystemBase {
         "Arm Position (deg)", armEncoder::getPosition, armEncoder::setPosition);
     builder.addDoubleProperty("Arm Vel (deg/s)", armEncoder::getVelocity, null);
 
-    builder.addBooleanProperty(
-        "At desired position",
-        () -> {
-          return atPosition(desiredPosition);
-        },
-        null);
-
-    builder.addStringProperty(
-        "Desired position",
-        () -> {
-          return desiredPosition.toString();
-        },
-        null);
-    builder.addStringProperty(
-        "Latest position",
-        () -> {
-          return latestPosition.toString();
-        },
-        null);
-    builder.addStringProperty(
-        "Goal position",
-        () -> {
-          return goalPosition.toString();
-        },
-        null);
     builder.addDoubleProperty("Arm output", armMotor::get, null);
     builder.addStringProperty(
         "Score Loc Height",
