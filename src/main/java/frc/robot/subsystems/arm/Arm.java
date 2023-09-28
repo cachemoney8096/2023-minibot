@@ -9,7 +9,6 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMax.SoftLimitDirection;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-import com.revrobotics.REVLibError;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -18,7 +17,6 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotMap;
 import frc.robot.utils.ScoringLocationUtil;
@@ -81,59 +79,19 @@ public class Arm extends SubsystemBase {
   // This method will be called once per scheduler run
   public void periodic() {
     // Check if position has updated
-    if (atPosition(ArmPosition.STARTING)) {
-      this.latestPosition = ArmPosition.STARTING;
-    } else if (atPosition(desiredPosition)) {
-      this.latestPosition = desiredPosition;
-    }
-
-    controlPosition(desiredPosition);
+    
   }
 
   /** Sets the desired position */
-  public void setDesiredPosition(ArmPosition pos) {
-    desiredPosition = pos;
-  }
 
   public void startScore() {
     scoringInProgress = true;
     if (scoreLoc.getScoreHeight() == ScoreHeight.HIGH
         || scoreLoc.getScoreHeight() == ScoreHeight.MID) {
-      setDesiredPosition(ArmPosition.SCORE_MID_HIGH);
+      goToPosition(ArmPosition.SCORE_MID_HIGH);
     } else if (scoreLoc.getScoreHeight() == ScoreHeight.LOW) {
-      setDesiredPosition(ArmPosition.SCORE_LOW);
+      goToPosition(ArmPosition.SCORE_LOW);
     }
-  }
-
-  public void deployArmLessFar() {
-    Double curAngle = armPositionMap.get(desiredPosition);
-    Double newAngle = curAngle - 0.5;
-    armPositionMap.replace(desiredPosition, newAngle);
-
-    new PrintCommand("Latest angle for " + desiredPosition + ": " + newAngle);
-
-    armController.setGoal(newAngle);
-  }
-
-  public void deployArmFurther() {
-    Double curAngle = armPositionMap.get(desiredPosition);
-    Double newAngle = curAngle + 0.5;
-    armPositionMap.replace(desiredPosition, newAngle);
-
-    new PrintCommand("Latest angle for " + desiredPosition + ": " + newAngle);
-
-    armController.setGoal(newAngle);
-  }
-
-  /** True if the arm is at the current value of this.desiredPosition */
-  public boolean atDesiredArmPosition() {
-    double armMarginDegrees =
-        desiredPosition == ArmPosition.STARTING
-            ? ArmCal.ARM_START_MARGIN_DEGREES
-            : ArmCal.ARM_MARGIN_DEGREES;
-    double armPositionToCheckDegrees = armPositionMap.get(desiredPosition);
-    double armPositionDegrees = armEncoder.getPosition();
-    return Math.abs(armPositionDegrees - armPositionToCheckDegrees) <= armMarginDegrees;
   }
 
   /** True if the arm is at the queried position. */
@@ -156,53 +114,21 @@ public class Arm extends SubsystemBase {
             armEncoder.getPosition() - ArmConstants.ARM_POSITION_WHEN_HORIZONTAL_DEGREES));
   }
 
-  /** Sends voltage commands to the arm and elevator motors, needs to be called every cycle */
-  private void controlPosition(ArmPosition pos) {
-    if (goalPosition != pos) {
-      goalPosition = pos;
-    }
-
+  /** Sends voltage commands to the arm and elevator motors*/
+  public void goToPosition(ArmPosition pos) {
     armController.setGoal(armPositionMap.get(pos));
-
     double armDemandVoltsA = armController.calculate(armEncoder.getPosition());
     double armDemandVoltsB = ArmCal.ARM_FEEDFORWARD.calculate(armController.getSetpoint().velocity);
     double armDemandVoltsC = ArmCal.ARBITRARY_ARM_FEED_FORWARD_VOLTS * getCosineArmAngle();
     armMotor.setVoltage(armDemandVoltsA + armDemandVoltsB + armDemandVoltsC);
-
     SmartDashboard.putNumber("Arm PID", armDemandVoltsA);
     SmartDashboard.putNumber("Arm FF", armDemandVoltsB);
     SmartDashboard.putNumber("Arm Gravity", armDemandVoltsC);
   }
 
-  /**
-   * if the robot has completed startScore() but hasn't started finishScore, then stop the robot
-   * from scoring
-   */
-  public void cancelScore() {
-    if (scoringInProgress) {
-      setCancelScore(true);
-    }
-  }
-
-  /** Runs instead of finishScore if cancelScore is true. */
-  public void finishScoreCancelled() {
-    setCancelScore(false);
-    ManualPrepScoreSequence();
-  }
-
   /** returns cancelScore (true if scoring action is cancelled) */
   public boolean getCancelScore() {
     return this.cancelScore;
-  }
-
-  /** sets cancelScore (true if scoring action is cancelled) */
-  public void setCancelScore(boolean cancelled) {
-    this.cancelScore = cancelled;
-  }
-
-  /** sets scoringInProgress */
-  public void setScoringInProgress(boolean isScoring) {
-    scoringInProgress = isScoring;
   }
 
   /**
@@ -214,9 +140,9 @@ public class Arm extends SubsystemBase {
 
     // low for all columns is the same height
     if (height == ScoreHeight.LOW) {
-      setDesiredPosition(ArmPosition.SCORE_LOW);
+      goToPosition(ArmPosition.SCORE_LOW);
     } else {
-      setDesiredPosition(ArmPosition.SCORE_MID_HIGH);
+      goToPosition(ArmPosition.SCORE_MID_HIGH);
     }
   }
 
@@ -229,30 +155,20 @@ public class Arm extends SubsystemBase {
     System.out.println("New Zero for Arm: " + ArmCal.ARM_ABSOLUTE_ENCODER_ZERO_POS_DEG);
   }
 
-  public REVLibError setDegreesFromGearRatioAbsoluteEncoder(
+  public void setDegreesFromGearRatioAbsoluteEncoder(
       AbsoluteEncoder sparkMaxEncoder, double ratio) {
     double degreesPerRotation = 360.0 / ratio;
     double degreesPerRotationPerSecond = degreesPerRotation / 60.0;
-    REVLibError error = sparkMaxEncoder.setPositionConversionFactor(degreesPerRotation);
-
-    if (error != REVLibError.kOk) {
-      return error;
-    }
-
-    return sparkMaxEncoder.setVelocityConversionFactor(degreesPerRotationPerSecond);
+    sparkMaxEncoder.setPositionConversionFactor(degreesPerRotation);
+    sparkMaxEncoder.setVelocityConversionFactor(degreesPerRotationPerSecond);
   }
 
-  public static REVLibError setDegreesFromGearRatioRelativeEncoder(
-      RelativeEncoder sparkMaxEncoder, double ratio) {
+  public static void setDegreesFromGearRatioRelativeEncoder(
+    RelativeEncoder sparkMaxEncoder, double ratio) {
     double degreesPerRotation = 360.0 / ratio;
     double degreesPerRotationPerSecond = degreesPerRotation / 60.0;
-    REVLibError error = sparkMaxEncoder.setPositionConversionFactor(degreesPerRotation);
-
-    if (error != REVLibError.kOk) {
-      return error;
-    }
-
-    return sparkMaxEncoder.setVelocityConversionFactor(degreesPerRotationPerSecond);
+    sparkMaxEncoder.setPositionConversionFactor(degreesPerRotation);
+    sparkMaxEncoder.setVelocityConversionFactor(degreesPerRotationPerSecond);
   }
 
   /** Does all the initialization for the sparks */
@@ -308,7 +224,6 @@ public class Arm extends SubsystemBase {
           return atPosition(desiredPosition);
         },
         null);
-    builder.addBooleanProperty("At desired arm position", this::atDesiredArmPosition, null);
 
     builder.addStringProperty(
         "Desired position",

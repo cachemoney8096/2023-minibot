@@ -15,21 +15,20 @@ public class IntakeSequence extends SequentialCommandGroup {
     addRequirements(arm, grabber, lights);
     addCommands(
         new InstantCommand(() -> lights.toggleCode(LightCode.OFF)),
-        new InstantCommand(() -> arm.setDesiredPosition(ArmPosition.INTAKE)),
-        new WaitUntilCommand(arm::atDesiredArmPosition),
+        new InstantCommand(() -> arm.goToPosition(ArmPosition.INTAKE)),
         new InstantCommand(() -> grabber.intake()),
         new WaitUntilCommand((grabber::seeGamePiece)),
         new InstantCommand(() -> lights.toggleCode(LightCode.GAME_OBJECT)),
         new InstantCommand(() -> grabber.stopMotors()),
-        new InstantCommand(() -> arm.setDesiredPosition(ArmPosition.STARTING)));
+        new InstantCommand(() -> arm.goToPosition(ArmPosition.STARTING)));
   }
 
   public static Command interruptibleIntakeSequence(Arm arm, Grabber grabber, Lights lights) {
     return new IntakeSequence(arm, grabber, lights)
         .finallyDo(
             (boolean interrupted) -> {
-              arm.setDesiredPosition(ArmPosition.STARTING);
               grabber.stopMotors();
+              arm.goToPosition(ArmPosition.STARTING);
               lights.toggleCode(LightCode.OFF);
             });
   }
