@@ -24,6 +24,7 @@ import frc.robot.utils.ScoringLocationUtil;
 import frc.robot.utils.ScoringLocationUtil.ScoreHeight;
 import frc.robot.utils.SendableHelper;
 import java.util.TreeMap;
+import frc.robot.subsystems.grabber.*;
 
 public class Arm extends SubsystemBase {
 
@@ -42,10 +43,10 @@ public class Arm extends SubsystemBase {
   private final RelativeEncoder armEncoder = armMotor.getEncoder();
   private final AbsoluteEncoder armAbsoluteEncoder = armMotor.getAbsoluteEncoder(Type.kDutyCycle);
 
-  private boolean scoringInProgress = false;
-  private boolean cancelScore = false;
   public ScoringLocationUtil scoreLoc;
   private ArmPosition desiredPosition = ArmPosition.STARTING;
+  public boolean isScoring = false;
+  public boolean cancelScore = false;
 
   TreeMap<ArmPosition, Double> armPositionMap;
 
@@ -77,7 +78,7 @@ public class Arm extends SubsystemBase {
   /** Sets the desired position */
 
   public void startScore() {
-    scoringInProgress = true;
+    isScoring = true;
     if (scoreLoc.getScoreHeight() == ScoreHeight.HIGH
         || scoreLoc.getScoreHeight() == ScoreHeight.MID) {
       goToPosition(ArmPosition.SCORE_MID_HIGH);
@@ -161,37 +162,6 @@ public class Arm extends SubsystemBase {
     System.out.println("New Zero for Arm: " + ArmCal.ARM_ABSOLUTE_ENCODER_ZERO_POS_DEG);
   }
 
-  /**
-   * if the robot has completed startScore() but hasn't started finishScore, then stop the robot
-   * from scoring
-   */
-  public void cancelScore() {
-    if (scoringInProgress) {
-      setCancelScore(true);
-    }
-  }
-
-  /** Runs instead of finishScore if cancelScore is true. */
-  public void finishScoreCancelled() {
-    setCancelScore(false);
-    ManualPrepScoreSequence();
-  }
-
-  /** returns cancelScore (true if scoring action is cancelled) */
-  public boolean getCancelScore() {
-    return this.cancelScore;
-  }
-
-  /** sets cancelScore (true if scoring action is cancelled) */
-  public void setCancelScore(boolean cancelled) {
-    this.cancelScore = cancelled;
-  }
-
-  /** sets scoringInProgress */
-  public void setScoringInProgress(boolean isScoring) {
-    scoringInProgress = isScoring;
-  }
-
   public void setDegreesFromGearRatioAbsoluteEncoder(
       AbsoluteEncoder sparkMaxEncoder, double ratio) {
     double degreesPerRotation = 360.0 / ratio;
@@ -218,6 +188,30 @@ public class Arm extends SubsystemBase {
     double armPositionToCheckDegrees = armPositionMap.get(desiredPosition);
     double armPositionDegrees = armEncoder.getPosition();
     return Math.abs(armPositionDegrees - armPositionToCheckDegrees) <= armMarginDegrees;
+  }
+
+  @Override
+  public void periodic(){
+    if(cancelScore && isScoring){
+      goToPosition(ArmPosition.STARTING);
+      cancelScore = false;
+      isScoring = false;
+    }
+  }
+
+  /**Cancellation function */
+  public void cancelScore(){
+    cancelScore = true;
+  }
+
+  /**Output if we are scoring or not */
+  public boolean currentlyScoring(){
+    return isScoring;
+  }
+
+  /**Set whether we are scoring */
+  public void setScoring(boolean scoring){
+    isScoring = scoring;
   }
 
   /** Does all the initialization for the sparks */
