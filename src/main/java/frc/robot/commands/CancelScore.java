@@ -10,9 +10,8 @@ public class CancelScore extends SequentialCommandGroup {
   public CancelScore(Arm arm, Grabber grabber, Lights lights) {
     addRequirements(arm, grabber, lights);
     addCommands(
-        new InstantCommand(()-> arm.cancelScore()),
+        new InstantCommand(() -> arm.cancelScore()),
         new InstantCommand(() -> grabber.stopMotors()),
-        new InstantCommand(() -> lights.toggleCode(Lights.LightCode.OFF))
-    );
+        new InstantCommand(() -> lights.toggleCode(Lights.LightCode.OFF)));
   }
 }

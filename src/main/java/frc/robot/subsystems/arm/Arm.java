@@ -75,7 +75,6 @@ public class Arm extends SubsystemBase {
   public void initialize() {}
 
   /** Sets the desired position */
-
   public void startScore() {
     isScoring = true;
     if (scoreLoc.getScoreHeight() == ScoreHeight.HIGH
@@ -106,7 +105,7 @@ public class Arm extends SubsystemBase {
             armEncoder.getPosition() - ArmConstants.ARM_POSITION_WHEN_HORIZONTAL_DEGREES));
   }
 
-  /** Sends voltage commands to the arm and elevator motors*/
+  /** Sends voltage commands to the arm and elevator motors */
   public void goToPosition(ArmPosition pos) {
     armController.setGoal(armPositionMap.get(pos));
     double armDemandVoltsA = armController.calculate(armEncoder.getPosition());
@@ -170,7 +169,7 @@ public class Arm extends SubsystemBase {
   }
 
   public static void setDegreesFromGearRatioRelativeEncoder(
-    RelativeEncoder sparkMaxEncoder, double ratio) {
+      RelativeEncoder sparkMaxEncoder, double ratio) {
     double degreesPerRotation = 360.0 / ratio;
     double degreesPerRotationPerSecond = degreesPerRotation / 60.0;
     sparkMaxEncoder.setPositionConversionFactor(degreesPerRotation);
@@ -178,7 +177,6 @@ public class Arm extends SubsystemBase {
   }
 
   /** True if the arm is at the queried position. */
-
   public boolean atDesiredArmPosition() {
     double armMarginDegrees =
         desiredPosition == ArmPosition.STARTING
@@ -190,36 +188,36 @@ public class Arm extends SubsystemBase {
   }
 
   @Override
-  public void periodic(){
-    if(cancelScore && isScoring){
+  public void periodic() {
+    if (cancelScore && isScoring) {
       goToPosition(ArmPosition.STARTING);
       cancelScore = false;
       isScoring = false;
     }
   }
 
-  /**Cancellation function */
-  public void cancelScore(){
+  /** Cancellation function */
+  public void cancelScore() {
     cancelScore = true;
   }
 
-  /**Output if we are scoring or not */
-  public boolean currentlyScoring(){
+  /** Output if we are scoring or not */
+  public boolean currentlyScoring() {
     return isScoring;
   }
 
-  /**Set whether we are scoring */
-  public void setScoring(boolean scoring){
+  /** Set whether we are scoring */
+  public void setScoring(boolean scoring) {
     isScoring = scoring;
   }
 
-  /**Output if we are cancelling or not */
-  public boolean isCancellingScore(){
+  /** Output if we are cancelling or not */
+  public boolean isCancellingScore() {
     return cancelScore;
   }
 
-  /**Set whether we are cancelling score */
-  public void setCancelScore(boolean scoring){
+  /** Set whether we are cancelling score */
+  public void setCancelScore(boolean scoring) {
     cancelScore = scoring;
   }
 
@@ -280,20 +278,20 @@ public class Arm extends SubsystemBase {
         },
         null);
 
-        builder.addBooleanProperty(
-          "At desired position",
-          () -> {
-            return atPosition(desiredPosition);
-          },
-          null);
-      builder.addBooleanProperty("At desired arm position", this::atDesiredArmPosition, null);
-  
-      builder.addStringProperty(
-          "Desired position",
-          () -> {
-            return desiredPosition.toString();
-          },
-          null);
+    builder.addBooleanProperty(
+        "At desired position",
+        () -> {
+          return atPosition(desiredPosition);
+        },
+        null);
+    builder.addBooleanProperty("At desired arm position", this::atDesiredArmPosition, null);
+
+    builder.addStringProperty(
+        "Desired position",
+        () -> {
+          return desiredPosition.toString();
+        },
+        null);
     builder.addStringProperty(
         "Score Loc Col",
         () -> {
