@@ -15,7 +15,7 @@ public class OuttakeSequence extends SequentialCommandGroup {
   public OuttakeSequence(Arm arm, Grabber grabber, Lights lights) {
     addRequirements(arm, grabber, lights);
     addCommands(
-        new RunCommand(() -> arm.setDesiredPosition(ArmPosition.OUTTAKE))
+        new RunCommand(() -> arm.goToPosition(ArmPosition.OUTTAKE))
             .until(() -> arm.atPosition(ArmPosition.OUTTAKE)),
         new InstantCommand(() -> grabber.eject()),
         new WaitCommand(GrabberCalibrations.EJECTION_WAIT_TIME),

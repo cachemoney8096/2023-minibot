@@ -27,7 +27,8 @@ public class FinishScore extends SequentialCommandGroup {
         new InstantCommand(() -> grabber.score(scoringPower)),
         new WaitCommand(GrabberCalibrations.SCORING_WAIT_TIME),
         new InstantCommand(() -> grabber.stopMotors()),
-        new InstantCommand(() -> arm.setDesiredPosition(ArmPosition.STARTING)),
+        new InstantCommand(() -> arm.goToPosition(ArmPosition.STARTING)),
+        new InstantCommand(() -> arm.setScoring(false)),
         new InstantCommand(() -> lights.toggleCode(Lights.LightCode.OFF)));
   }
 }

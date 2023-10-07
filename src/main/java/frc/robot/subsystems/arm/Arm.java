@@ -9,7 +9,6 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMax.SoftLimitDirection;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-import com.revrobotics.REVLibError;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -45,10 +44,8 @@ public class Arm extends SubsystemBase {
 
   public ScoringLocationUtil scoreLoc;
   private ArmPosition desiredPosition = ArmPosition.STARTING;
-  private ArmPosition latestPosition = ArmPosition.STARTING;
-  private ArmPosition goalPosition = ArmPosition.STARTING;
-  private boolean cancelScore = false;
-  private boolean scoringInProgress = false;
+  public boolean isScoring = false;
+  public boolean cancelScore = false;
 
   TreeMap<ArmPosition, Double> armPositionMap;
 
@@ -77,63 +74,15 @@ public class Arm extends SubsystemBase {
 
   public void initialize() {}
 
-  @Override
-  // This method will be called once per scheduler run
-  public void periodic() {
-    // Check if position has updated
-    if (atPosition(ArmPosition.STARTING)) {
-      this.latestPosition = ArmPosition.STARTING;
-    } else if (atPosition(desiredPosition)) {
-      this.latestPosition = desiredPosition;
-    }
-
-    controlPosition(desiredPosition);
-  }
-
   /** Sets the desired position */
-  public void setDesiredPosition(ArmPosition pos) {
-    desiredPosition = pos;
-  }
-
   public void startScore() {
-    scoringInProgress = true;
+    isScoring = true;
     if (scoreLoc.getScoreHeight() == ScoreHeight.HIGH
         || scoreLoc.getScoreHeight() == ScoreHeight.MID) {
-      setDesiredPosition(ArmPosition.SCORE_MID_HIGH);
+      goToPosition(ArmPosition.SCORE_MID_HIGH);
     } else if (scoreLoc.getScoreHeight() == ScoreHeight.LOW) {
-      setDesiredPosition(ArmPosition.SCORE_LOW);
+      goToPosition(ArmPosition.SCORE_LOW);
     }
-  }
-
-  public void deployArmLessFar() {
-    Double curAngle = armPositionMap.get(desiredPosition);
-    Double newAngle = curAngle - 0.5;
-    armPositionMap.replace(desiredPosition, newAngle);
-
-    new PrintCommand("Latest angle for " + desiredPosition + ": " + newAngle);
-
-    armController.setGoal(newAngle);
-  }
-
-  public void deployArmFurther() {
-    Double curAngle = armPositionMap.get(desiredPosition);
-    Double newAngle = curAngle + 0.5;
-    armPositionMap.replace(desiredPosition, newAngle);
-
-    new PrintCommand("Latest angle for " + desiredPosition + ": " + newAngle);
-
-    armController.setGoal(newAngle);
-  }
-
-  /** True if the arm is at the current value of this.desiredPosition */
-  public boolean atDesiredArmPosition() {
-    double armMarginDegrees =
-        desiredPosition == ArmPosition.STARTING
-            ? ArmCal.ARM_START_MARGIN_DEGREES
-            : ArmCal.ARM_MARGIN_DEGREES;
-    double armPositionToCheckDegrees = armPositionMap.get(desiredPosition);
-    double armPositionDegrees = armEncoder.getPosition();
-    return Math.abs(armPositionDegrees - armPositionToCheckDegrees) <= armMarginDegrees;
   }
 
   /** True if the arm is at the queried position. */
@@ -156,55 +105,37 @@ public class Arm extends SubsystemBase {
             armEncoder.getPosition() - ArmConstants.ARM_POSITION_WHEN_HORIZONTAL_DEGREES));
   }
 
-  /** Sends voltage commands to the arm and elevator motors, needs to be called every cycle */
-  private void controlPosition(ArmPosition pos) {
-    if (goalPosition != pos) {
-      goalPosition = pos;
-    }
-
+  /** Sends voltage commands to the arm and elevator motors */
+  public void goToPosition(ArmPosition pos) {
     armController.setGoal(armPositionMap.get(pos));
-
     double armDemandVoltsA = armController.calculate(armEncoder.getPosition());
     double armDemandVoltsB = ArmCal.ARM_FEEDFORWARD.calculate(armController.getSetpoint().velocity);
     double armDemandVoltsC = ArmCal.ARBITRARY_ARM_FEED_FORWARD_VOLTS * getCosineArmAngle();
     armMotor.setVoltage(armDemandVoltsA + armDemandVoltsB + armDemandVoltsC);
-
     SmartDashboard.putNumber("Arm PID", armDemandVoltsA);
     SmartDashboard.putNumber("Arm FF", armDemandVoltsB);
     SmartDashboard.putNumber("Arm Gravity", armDemandVoltsC);
   }
 
-  /**
-   * if the robot has completed startScore() but hasn't started finishScore, then stop the robot
-   * from scoring
-   */
-  public void cancelScore() {
-    if (scoringInProgress) {
-      setCancelScore(true);
-    }
+  public void deployArmLessFar() {
+    Double curAngle = armPositionMap.get(desiredPosition);
+    Double newAngle = curAngle - 0.5;
+    armPositionMap.replace(desiredPosition, newAngle);
+
+    new PrintCommand("Latest angle for " + desiredPosition + ": " + newAngle);
+
+    armController.setGoal(newAngle);
   }
 
-  /** Runs instead of finishScore if cancelScore is true. */
-  public void finishScoreCancelled() {
-    setCancelScore(false);
-    ManualPrepScoreSequence();
-  }
+  public void deployArmFurther() {
+    Double curAngle = armPositionMap.get(desiredPosition);
+    Double newAngle = curAngle + 0.5;
+    armPositionMap.replace(desiredPosition, newAngle);
 
-  /** returns cancelScore (true if scoring action is cancelled) */
-  public boolean getCancelScore() {
-    return this.cancelScore;
-  }
+    new PrintCommand("Latest angle for " + desiredPosition + ": " + newAngle);
 
-  /** sets cancelScore (true if scoring action is cancelled) */
-  public void setCancelScore(boolean cancelled) {
-    this.cancelScore = cancelled;
+    armController.setGoal(newAngle);
   }
-
-  /** sets scoringInProgress */
-  public void setScoringInProgress(boolean isScoring) {
-    scoringInProgress = isScoring;
-  }
-
   /**
    * takes the column and height from ScoringLocationUtil.java and converts that to a ArmPosition
    * then gives the position to the given arm
@@ -214,9 +145,9 @@ public class Arm extends SubsystemBase {
 
     // low for all columns is the same height
     if (height == ScoreHeight.LOW) {
-      setDesiredPosition(ArmPosition.SCORE_LOW);
+      goToPosition(ArmPosition.SCORE_LOW);
     } else {
-      setDesiredPosition(ArmPosition.SCORE_MID_HIGH);
+      goToPosition(ArmPosition.SCORE_MID_HIGH);
     }
   }
 
@@ -229,30 +160,65 @@ public class Arm extends SubsystemBase {
     System.out.println("New Zero for Arm: " + ArmCal.ARM_ABSOLUTE_ENCODER_ZERO_POS_DEG);
   }
 
-  public REVLibError setDegreesFromGearRatioAbsoluteEncoder(
+  public void setDegreesFromGearRatioAbsoluteEncoder(
       AbsoluteEncoder sparkMaxEncoder, double ratio) {
     double degreesPerRotation = 360.0 / ratio;
     double degreesPerRotationPerSecond = degreesPerRotation / 60.0;
-    REVLibError error = sparkMaxEncoder.setPositionConversionFactor(degreesPerRotation);
-
-    if (error != REVLibError.kOk) {
-      return error;
-    }
-
-    return sparkMaxEncoder.setVelocityConversionFactor(degreesPerRotationPerSecond);
+    sparkMaxEncoder.setPositionConversionFactor(degreesPerRotation);
+    sparkMaxEncoder.setVelocityConversionFactor(degreesPerRotationPerSecond);
   }
 
-  public static REVLibError setDegreesFromGearRatioRelativeEncoder(
+  public static void setDegreesFromGearRatioRelativeEncoder(
       RelativeEncoder sparkMaxEncoder, double ratio) {
     double degreesPerRotation = 360.0 / ratio;
     double degreesPerRotationPerSecond = degreesPerRotation / 60.0;
-    REVLibError error = sparkMaxEncoder.setPositionConversionFactor(degreesPerRotation);
+    sparkMaxEncoder.setPositionConversionFactor(degreesPerRotation);
+    sparkMaxEncoder.setVelocityConversionFactor(degreesPerRotationPerSecond);
+  }
 
-    if (error != REVLibError.kOk) {
-      return error;
+  /** True if the arm is at the queried position. */
+  public boolean atDesiredArmPosition() {
+    double armMarginDegrees =
+        desiredPosition == ArmPosition.STARTING
+            ? ArmCal.ARM_START_MARGIN_DEGREES
+            : ArmCal.ARM_MARGIN_DEGREES;
+    double armPositionToCheckDegrees = armPositionMap.get(desiredPosition);
+    double armPositionDegrees = armEncoder.getPosition();
+    return Math.abs(armPositionDegrees - armPositionToCheckDegrees) <= armMarginDegrees;
+  }
+
+  @Override
+  public void periodic() {
+    if (cancelScore && isScoring) {
+      goToPosition(ArmPosition.STARTING);
+      cancelScore = false;
+      isScoring = false;
     }
+  }
 
-    return sparkMaxEncoder.setVelocityConversionFactor(degreesPerRotationPerSecond);
+  /** Cancellation function */
+  public void cancelScore() {
+    cancelScore = true;
+  }
+
+  /** Output if we are scoring or not */
+  public boolean currentlyScoring() {
+    return isScoring;
+  }
+
+  /** Set whether we are scoring */
+  public void setScoring(boolean scoring) {
+    isScoring = scoring;
+  }
+
+  /** Output if we are cancelling or not */
+  public boolean isCancellingScore() {
+    return cancelScore;
+  }
+
+  /** Set whether we are cancelling score */
+  public void setCancelScore(boolean scoring) {
+    cancelScore = scoring;
   }
 
   /** Does all the initialization for the sparks */
@@ -298,9 +264,19 @@ public class Arm extends SubsystemBase {
 
     builder.addDoubleProperty(
         "Arm Abs Position (deg)", armAbsoluteEncoder::getPosition, armEncoder::setPosition);
+    builder.addBooleanProperty("Is scoring", this::currentlyScoring, this::setScoring);
+    builder.addBooleanProperty("Cancelling score", this::isCancellingScore, this::setCancelScore);
     builder.addDoubleProperty(
         "Arm Position (deg)", armEncoder::getPosition, armEncoder::setPosition);
     builder.addDoubleProperty("Arm Vel (deg/s)", armEncoder::getVelocity, null);
+
+    builder.addDoubleProperty("Arm output", armMotor::get, null);
+    builder.addStringProperty(
+        "Score Loc Height",
+        () -> {
+          return scoreLoc.getScoreHeight().toString();
+        },
+        null);
 
     builder.addBooleanProperty(
         "At desired position",
@@ -316,26 +292,6 @@ public class Arm extends SubsystemBase {
           return desiredPosition.toString();
         },
         null);
-    builder.addStringProperty(
-        "Latest position",
-        () -> {
-          return latestPosition.toString();
-        },
-        null);
-    builder.addStringProperty(
-        "Goal position",
-        () -> {
-          return goalPosition.toString();
-        },
-        null);
-    builder.addDoubleProperty("Arm output", armMotor::get, null);
-    builder.addStringProperty(
-        "Score Loc Height",
-        () -> {
-          return scoreLoc.getScoreHeight().toString();
-        },
-        null);
-
     builder.addStringProperty(
         "Score Loc Col",
         () -> {
