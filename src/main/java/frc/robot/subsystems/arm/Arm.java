@@ -24,7 +24,6 @@ import frc.robot.utils.ScoringLocationUtil;
 import frc.robot.utils.ScoringLocationUtil.ScoreHeight;
 import frc.robot.utils.SendableHelper;
 import java.util.TreeMap;
-import frc.robot.subsystems.grabber.*;
 
 public class Arm extends SubsystemBase {
 
@@ -214,6 +213,16 @@ public class Arm extends SubsystemBase {
     isScoring = scoring;
   }
 
+  /**Output if we are cancelling or not */
+  public boolean isCancellingScore(){
+    return cancelScore;
+  }
+
+  /**Set whether we are cancelling score */
+  public void setCancelScore(boolean scoring){
+    cancelScore = scoring;
+  }
+
   /** Does all the initialization for the sparks */
   private void initSparks() {
 
@@ -257,6 +266,8 @@ public class Arm extends SubsystemBase {
 
     builder.addDoubleProperty(
         "Arm Abs Position (deg)", armAbsoluteEncoder::getPosition, armEncoder::setPosition);
+    builder.addBooleanProperty("Is scoring", this::currentlyScoring, this::setScoring);
+    builder.addBooleanProperty("Cancelling score", this::isCancellingScore, this::setCancelScore);
     builder.addDoubleProperty(
         "Arm Position (deg)", armEncoder::getPosition, armEncoder::setPosition);
     builder.addDoubleProperty("Arm Vel (deg/s)", armEncoder::getVelocity, null);
