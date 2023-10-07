@@ -23,6 +23,9 @@ public class RobotMap {
   /** CANdle for the lights */
   public static final int CANDLE_CAN_ID = 12;
 
+  /** Pigeon Gyro CAN ID */
+  public static final int PIGEON_CAN_ID = 13;
+
   /** Channel for the game piece sensor */
   public static final int GRABBER_GAME_PIECE_SENSOR_DIO = Constants.PLACEHOLDER_INT;
 }
