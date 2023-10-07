@@ -1,5 +1,6 @@
 package frc.robot.subsystems.arm;
 
+import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 
 public class ArmCal {
@@ -13,8 +14,9 @@ public class ArmCal {
       ARM_D = PLACEHOLDER_DOUBLE;
 
   /** parameters for arm controller */
-  public static final double ARM_MAX_VELOCITY_DEG_PER_SECOND = PLACEHOLDER_DOUBLE,
-      ARM_MAX_ACCELERATION_DEG_PER_SECOND_SQUARED = PLACEHOLDER_DOUBLE;
+  public static final double ARM_MAX_VELOCITY_DEG_PER_SECOND = 50.0,  // 5880 rpm / (60 sec/min) * (360 deg/rev) / 135.4 = 250.56
+      ARM_MAX_ACCELERATION_DEG_PER_SECOND_SQUARED = 50.0; // angular accel = Torque / Inertia. 3.36 Nm * 135.4 / (7.26 * 0.3^2) kg-m^2 * (360 deg / 2pi
+      // rad) = 39893 deg/s^2
 
   /** Arm positions in degrees for the armPositionMap */
   public static final double ARM_START_POSITION_DEG = 180.0,
@@ -25,23 +27,20 @@ public class ArmCal {
       ARM_OUTTAKE_POSITION_DEG = 270.0;
 
   /** Absolute encoder position when the arm is at 0 degrees */
-  public static double ARM_ABSOLUTE_ENCODER_ZERO_POS_DEG = PLACEHOLDER_DOUBLE;
+  public static double armAbsoluteEncoderZeroPosDeg = PLACEHOLDER_DOUBLE; 
 
   /**
    * Margin for when we consider the arm has reached a position. This is logical (for considering
    * where the arm can go) but not functional (does not stop anything when reached). We apply
    * broader margins for the STARTING position as the arm transits through this position.
    */
-  public static final double ARM_MARGIN_DEGREES = PLACEHOLDER_DOUBLE,
-      ARM_START_MARGIN_DEGREES = PLACEHOLDER_DOUBLE;
+  public static final double ARM_MARGIN_DEGREES = 2.0;
 
   /** Input deg/s, output volts. From recalc */
-  public static final SimpleMotorFeedforward ARM_FEEDFORWARD =
-      new SimpleMotorFeedforward(PLACEHOLDER_DOUBLE, PLACEHOLDER_DOUBLE, PLACEHOLDER_DOUBLE);
+  public static final ArmFeedforward ARM_FEEDFORWARD =
+      new ArmFeedforward(0.0, 0.53, 2.63, 0.02);
 
-  public static final double ARBITRARY_ARM_FEED_FORWARD_VOLTS = PLACEHOLDER_DOUBLE;
-
-  public static final float ARM_NEGATIVE_LIMIT_DEGREES = PLACEHOLDER_FLOAT;
-  public static final float ARM_POSITIVE_LIMIT_DEGREES = PLACEHOLDER_FLOAT;
-  public static final int ARM_CURRENT_LIMIT_AMPS = PLACEHOLDER_INT;
+  public static final float ARM_NEGATIVE_LIMIT_DEGREES = 75;
+  public static final float ARM_POSITIVE_LIMIT_DEGREES = 275;
+  public static final int ARM_CURRENT_LIMIT_AMPS = 50;
 }

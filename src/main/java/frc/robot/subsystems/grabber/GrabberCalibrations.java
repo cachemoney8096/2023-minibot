@@ -13,4 +13,7 @@ public final class GrabberCalibrations {
   /* wait times spinning motors for various actions*/
   public static final double SCORING_WAIT_TIME = PLACEHOLDER_DOUBLE,
       EJECTION_WAIT_TIME = PLACEHOLDER_DOUBLE;
+
+  /* motor max current*/
+  public static final int MOTOR_CURRENT_LIMIT = 30;
 }
