@@ -13,7 +13,6 @@ import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -32,8 +31,7 @@ public class Arm extends SubsystemBase {
     INTAKE,
     SCORE_LOW,
     SCORE_MID_HIGH,
-    AVOID_LIMELIGHT,
-    OUTTAKE
+    AVOID_LIMELIGHT
   }
 
   public CANSparkMax armMotor =
@@ -45,7 +43,6 @@ public class Arm extends SubsystemBase {
   public ScoringLocationUtil scoreLoc;
   private ArmPosition desiredPosition = ArmPosition.STARTING;
   public boolean isScoring = false;
-  public boolean cancelScore = false;
 
   TreeMap<ArmPosition, Double> armPositionMap;
 
@@ -67,7 +64,6 @@ public class Arm extends SubsystemBase {
     armPositionMap.put(ArmPosition.SCORE_LOW, ArmCal.ARM_LOW_POSITION_DEG);
     armPositionMap.put(ArmPosition.SCORE_MID_HIGH, ArmCal.ARM_HIGH_MID_POSITION_DEG);
     armPositionMap.put(ArmPosition.AVOID_LIMELIGHT, ArmCal.ARM_AVOID_LIMELIGHT_POSITION_DEG);
-    armPositionMap.put(ArmPosition.OUTTAKE, ArmCal.ARM_OUTTAKE_POSITION_DEG);
 
     this.scoreLoc = scoreLoc;
   }
@@ -87,34 +83,28 @@ public class Arm extends SubsystemBase {
 
   /** True if the arm is at the queried position. */
   public boolean atPosition(ArmPosition positionToCheck) {
-    double armMarginDegrees =
-        positionToCheck == ArmPosition.STARTING
-            ? ArmCal.ARM_START_MARGIN_DEGREES
-            : ArmCal.ARM_MARGIN_DEGREES;
-
     double armPositionToCheckDegrees = armPositionMap.get(positionToCheck);
     double armPositionDegrees = armEncoder.getPosition();
 
-    return Math.abs(armPositionDegrees - armPositionToCheckDegrees) <= armMarginDegrees;
+    return Math.abs(armPositionDegrees - armPositionToCheckDegrees) <= ArmCal.ARM_MARGIN_DEGREES;
   }
 
-  /** Returns the cosine of the arm angle in degrees off of the horizontal. */
-  public double getCosineArmAngle() {
-    return Math.cos(
-        Units.degreesToRadians(
-            armEncoder.getPosition() - ArmConstants.ARM_POSITION_WHEN_HORIZONTAL_DEGREES));
+  /** Returns the arm angle in degrees off of the horizontal. */
+  public double getArmAngleRelativeToHorizontal() {
+    return armEncoder.getPosition() - ArmConstants.ARM_POSITION_WHEN_HORIZONTAL_DEGREES;
   }
 
   /** Sends voltage commands to the arm and elevator motors */
   public void goToPosition(ArmPosition pos) {
     armController.setGoal(armPositionMap.get(pos));
+    desiredPosition = pos;
     double armDemandVoltsA = armController.calculate(armEncoder.getPosition());
-    double armDemandVoltsB = ArmCal.ARM_FEEDFORWARD.calculate(armController.getSetpoint().velocity);
-    double armDemandVoltsC = ArmCal.ARBITRARY_ARM_FEED_FORWARD_VOLTS * getCosineArmAngle();
-    armMotor.setVoltage(armDemandVoltsA + armDemandVoltsB + armDemandVoltsC);
+    double armDemandVoltsB =
+        ArmCal.ARM_FEEDFORWARD.calculate(
+            getArmAngleRelativeToHorizontal(), armController.getSetpoint().velocity);
+    armMotor.setVoltage(armDemandVoltsA + armDemandVoltsB);
     SmartDashboard.putNumber("Arm PID", armDemandVoltsA);
     SmartDashboard.putNumber("Arm FF", armDemandVoltsB);
-    SmartDashboard.putNumber("Arm Gravity", armDemandVoltsC);
   }
 
   public void deployArmLessFar() {
@@ -156,8 +146,8 @@ public class Arm extends SubsystemBase {
   }
 
   public void zeroArmAtCurrentPos() {
-    ArmCal.ARM_ABSOLUTE_ENCODER_ZERO_POS_DEG = armAbsoluteEncoder.getPosition();
-    System.out.println("New Zero for Arm: " + ArmCal.ARM_ABSOLUTE_ENCODER_ZERO_POS_DEG);
+    ArmCal.armAbsoluteEncoderZeroPosDeg = armAbsoluteEncoder.getPosition();
+    System.out.println("New Zero for Arm: " + ArmCal.armAbsoluteEncoderZeroPosDeg);
   }
 
   public void setDegreesFromGearRatioAbsoluteEncoder(
@@ -178,27 +168,18 @@ public class Arm extends SubsystemBase {
 
   /** True if the arm is at the queried position. */
   public boolean atDesiredArmPosition() {
-    double armMarginDegrees =
-        desiredPosition == ArmPosition.STARTING
-            ? ArmCal.ARM_START_MARGIN_DEGREES
-            : ArmCal.ARM_MARGIN_DEGREES;
     double armPositionToCheckDegrees = armPositionMap.get(desiredPosition);
     double armPositionDegrees = armEncoder.getPosition();
-    return Math.abs(armPositionDegrees - armPositionToCheckDegrees) <= armMarginDegrees;
+    return Math.abs(armPositionDegrees - armPositionToCheckDegrees) <= ArmCal.ARM_MARGIN_DEGREES;
   }
 
   @Override
-  public void periodic() {
-    if (cancelScore && isScoring) {
-      goToPosition(ArmPosition.STARTING);
-      cancelScore = false;
-      isScoring = false;
-    }
-  }
+  public void periodic() {}
 
   /** Cancellation function */
   public void cancelScore() {
-    cancelScore = true;
+    goToPosition(ArmPosition.STARTING);
+    isScoring = false;
   }
 
   /** Output if we are scoring or not */
@@ -211,18 +192,8 @@ public class Arm extends SubsystemBase {
     isScoring = scoring;
   }
 
-  /** Output if we are cancelling or not */
-  public boolean isCancellingScore() {
-    return cancelScore;
-  }
-
-  /** Set whether we are cancelling score */
-  public void setCancelScore(boolean scoring) {
-    cancelScore = scoring;
-  }
-
   /** Does all the initialization for the sparks */
-  private void initSparks() {
+  public void initSparks() {
 
     armMotor.restoreFactoryDefaults();
 
@@ -265,7 +236,6 @@ public class Arm extends SubsystemBase {
     builder.addDoubleProperty(
         "Arm Abs Position (deg)", armAbsoluteEncoder::getPosition, armEncoder::setPosition);
     builder.addBooleanProperty("Is scoring", this::currentlyScoring, this::setScoring);
-    builder.addBooleanProperty("Cancelling score", this::isCancellingScore, this::setCancelScore);
     builder.addDoubleProperty(
         "Arm Position (deg)", armEncoder::getPosition, armEncoder::setPosition);
     builder.addDoubleProperty("Arm Vel (deg/s)", armEncoder::getVelocity, null);

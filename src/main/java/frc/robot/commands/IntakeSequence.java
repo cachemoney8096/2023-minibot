@@ -16,6 +16,7 @@ public class IntakeSequence extends SequentialCommandGroup {
     addCommands(
         new InstantCommand(() -> lights.toggleCode(LightCode.OFF)),
         new InstantCommand(() -> arm.goToPosition(ArmPosition.INTAKE)),
+        new WaitUntilCommand(arm::atDesiredArmPosition),
         new InstantCommand(() -> grabber.intake()),
         new WaitUntilCommand((grabber::seeGamePiece)),
         new InstantCommand(() -> lights.toggleCode(LightCode.GAME_OBJECT)),
