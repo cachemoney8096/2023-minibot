@@ -6,8 +6,6 @@ import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotMap;
-import frc.robot.subsystems.arm.Arm;
-import frc.robot.subsystems.arm.Arm.ArmPosition;
 import frc.robot.utils.ScoringLocationUtil.ScoreHeight;
 
 public class Grabber extends SubsystemBase {
@@ -24,7 +22,7 @@ public class Grabber extends SubsystemBase {
   private boolean runningCommand = false;
 
   public void spinMotors(double power) {
-    runningCommand = !(Math.abs(power)<0.01);
+    runningCommand = !(Math.abs(power) < 0.01);
     frontMotor.set(power);
   }
 
@@ -56,7 +54,7 @@ public class Grabber extends SubsystemBase {
     return !gamePieceSensor.get();
   }
 
-  public void initSparks(){
+  public void initSparks() {
     frontMotor.restoreFactoryDefaults();
     backMotor.restoreFactoryDefaults();
     backMotor.follow(frontMotor);
@@ -73,7 +71,7 @@ public class Grabber extends SubsystemBase {
   }
 
   public void periodic() {
-    if(seeGamePiece() && !runningCommand){
+    if (seeGamePiece() && !runningCommand) {
       spinMotors(GrabberCalibrations.HOLD_GAME_OBJECT_POWER);
     }
   }

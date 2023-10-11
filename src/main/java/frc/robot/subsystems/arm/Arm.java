@@ -13,7 +13,6 @@ import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -100,7 +99,9 @@ public class Arm extends SubsystemBase {
     armController.setGoal(armPositionMap.get(pos));
     desiredPosition = pos;
     double armDemandVoltsA = armController.calculate(armEncoder.getPosition());
-    double armDemandVoltsB = ArmCal.ARM_FEEDFORWARD.calculate(getArmAngleRelativeToHorizontal(), armController.getSetpoint().velocity);
+    double armDemandVoltsB =
+        ArmCal.ARM_FEEDFORWARD.calculate(
+            getArmAngleRelativeToHorizontal(), armController.getSetpoint().velocity);
     armMotor.setVoltage(armDemandVoltsA + armDemandVoltsB);
     SmartDashboard.putNumber("Arm PID", armDemandVoltsA);
     SmartDashboard.putNumber("Arm FF", armDemandVoltsB);
@@ -173,14 +174,12 @@ public class Arm extends SubsystemBase {
   }
 
   @Override
-  public void periodic(){
-    
-  }
+  public void periodic() {}
 
-  /**Cancellation function */
-  public void cancelScore(){
-      goToPosition(ArmPosition.STARTING);
-      isScoring = false;
+  /** Cancellation function */
+  public void cancelScore() {
+    goToPosition(ArmPosition.STARTING);
+    isScoring = false;
   }
 
   /** Output if we are scoring or not */
