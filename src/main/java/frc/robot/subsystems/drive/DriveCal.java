@@ -65,4 +65,7 @@ public class DriveCal {
       THROTTLE_FOR_SLOW_BUTTON = 0.5;
 
   public static final double IMU_PITCH_BIAS_DEG = 1.0;
+
+  public static final double LEFT_ANGLE_CARDINAL_DIRECTION = 77,
+      RIGHT_ANGLE_CARDINAL_DIRECTION = 77;
 }

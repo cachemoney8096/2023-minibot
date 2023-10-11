@@ -8,11 +8,18 @@ public class ModuleConstants {
 
   public static final double WHEEL_DIAMETER_FUDGE_FACTOR = 1.0;
 
-  public static final double
+  public static final double NEO_MOTOR_FREE_SPEED_RPM = 5676.0;
+
+  /** Calculations required for driving motor conversion factors and feed forward */
+  public static final double DRIVING_MOTOR_FREE_SPEED_RPS = NEO_MOTOR_FREE_SPEED_RPM / 60,
       WHEEL_DIAMETER_METERS = Units.inchesToMeters(3) * ModuleConstants.WHEEL_DIAMETER_FUDGE_FACTOR,
       WHEEL_CIRCUMFERENCE_METERS = WHEEL_DIAMETER_METERS * Math.PI;
 
   public static final double DRIVING_MOTOR_REDUCTION = 4.71;
+  public static final double DRIVE_WHEEL_FREE_SPEED_FUDGE_FACTOR = 1.0;
+  public static final double DRIVE_WHEEL_FREE_SPEED_METERS_PER_SECOND =
+      DRIVE_WHEEL_FREE_SPEED_FUDGE_FACTOR
+          * ((DRIVING_MOTOR_FREE_SPEED_RPS * WHEEL_CIRCUMFERENCE_METERS) / DRIVING_MOTOR_REDUCTION);
 
   /** Meters */
   public static final double DRIVING_ENCODER_POSITION_FACTOR_METERS =

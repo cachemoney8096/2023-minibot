@@ -293,15 +293,6 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
   /**
-   * Returns the turn rate of the robot.
-   *
-   * @return The turn rate of the robot, in degrees per second
-   */
-  public double getTurnRate() {
-    return gyro.getRate() * (DriveConstants.GYRO_REVERSED ? -1.0 : 1.0);
-  }
-
-  /**
    * Keeps the heading of the robot when the driver is not turning, by using PID to keep the
    * distance between the actual heading and the last intended heading to 0.
    *
@@ -329,10 +320,11 @@ public class DriveSubsystem extends SubsystemBase {
 
   public int convertCardinalDirections(int povAngleDeg) {
     // change d-pad values for left and right to specified angle
+    // povAngleDeg starts at 0 up and increases clockwise, so 270 is left and 90 is right
     if (povAngleDeg == 270) {
-      povAngleDeg += 77;
+      povAngleDeg += DriveCal.LEFT_ANGLE_CARDINAL_DIRECTION;
     } else if (povAngleDeg == 90) {
-      povAngleDeg -= 77;
+      povAngleDeg -= DriveCal.RIGHT_ANGLE_CARDINAL_DIRECTION;
     }
     // targetHeadingDegrees is counterclockwise so need to flip povAngle
     povAngleDeg = 360 - povAngleDeg;
