@@ -22,6 +22,9 @@ import frc.robot.utils.ScoringLocationUtil;
  * subsystems, commands, and trigger mappings) should be declared here.
  */
 public class RobotContainer {
+  // If true, this is a match with real timings
+  public boolean timedMatch = false;
+
   // The robot's subsystems and commands are defined here...
   private final ScoringLocationUtil scoreLoc = new ScoringLocationUtil();
   private Arm arm = new Arm(scoreLoc);
@@ -29,7 +32,7 @@ public class RobotContainer {
   private Grabber grabber = new Grabber();
   private Lights lights = new Lights();
   private TagLimelight tagLimelight = new TagLimelight();
-  private DriveSubsystem drive = new DriveSubsystem();
+  private DriveSubsystem drive = new DriveSubsystem(lights, () -> timedMatch);
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
 
