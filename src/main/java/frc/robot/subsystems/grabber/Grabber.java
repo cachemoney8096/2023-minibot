@@ -24,7 +24,7 @@ public class Grabber extends SubsystemBase {
   private boolean runningCommand = false;
 
   public void spinMotors(double power) {
-    runningCommand = power==0.0?false:true;
+    runningCommand = Math.abs(power)<0.01?false:true;
     frontMotor.set(power);
   }
 
@@ -61,6 +61,7 @@ public class Grabber extends SubsystemBase {
     backMotor.restoreFactoryDefaults();
     backMotor.follow(frontMotor);
     frontMotor.setSmartCurrentLimit(GrabberCalibrations.MOTOR_CURRENT_LIMIT);
+    backMotor.setSmartCurrentLimit(GrabberCalibrations.MOTOR_CURRENT_LIMIT);
   }
 
   @Override
@@ -73,7 +74,7 @@ public class Grabber extends SubsystemBase {
 
   public void periodic() {
     if(seeGamePiece() && !runningCommand){
-      spinMotors(0.1);
+      spinMotors(GrabberCalibrations.HOLD_GAME_OBJECT_POWER);
     }
   }
 }

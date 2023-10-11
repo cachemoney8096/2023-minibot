@@ -84,16 +84,14 @@ public class Arm extends SubsystemBase {
 
   /** True if the arm is at the queried position. */
   public boolean atPosition(ArmPosition positionToCheck) {
-    double armMarginDegrees = ArmCal.ARM_MARGIN_DEGREES;
-
     double armPositionToCheckDegrees = armPositionMap.get(positionToCheck);
     double armPositionDegrees = armEncoder.getPosition();
 
-    return Math.abs(armPositionDegrees - armPositionToCheckDegrees) <= armMarginDegrees;
+    return Math.abs(armPositionDegrees - armPositionToCheckDegrees) <= ArmCal.ARM_MARGIN_DEGREES;
   }
 
   /** Returns the arm angle in degrees off of the horizontal. */
-  public double getArmAngle() {
+  public double getArmAngleRelativeToHorizontal() {
     return armEncoder.getPosition() - ArmConstants.ARM_POSITION_WHEN_HORIZONTAL_DEGREES;
   }
 
@@ -102,7 +100,7 @@ public class Arm extends SubsystemBase {
     armController.setGoal(armPositionMap.get(pos));
     desiredPosition = pos;
     double armDemandVoltsA = armController.calculate(armEncoder.getPosition());
-    double armDemandVoltsB = ArmCal.ARM_FEEDFORWARD.calculate(getArmAngle(), armController.getSetpoint().velocity);
+    double armDemandVoltsB = ArmCal.ARM_FEEDFORWARD.calculate(getArmAngleRelativeToHorizontal(), armController.getSetpoint().velocity);
     armMotor.setVoltage(armDemandVoltsA + armDemandVoltsB);
     SmartDashboard.putNumber("Arm PID", armDemandVoltsA);
     SmartDashboard.putNumber("Arm FF", armDemandVoltsB);
@@ -169,10 +167,9 @@ public class Arm extends SubsystemBase {
 
   /** True if the arm is at the queried position. */
   public boolean atDesiredArmPosition() {
-    double armMarginDegrees = ArmCal.ARM_MARGIN_DEGREES;
     double armPositionToCheckDegrees = armPositionMap.get(desiredPosition);
     double armPositionDegrees = armEncoder.getPosition();
-    return Math.abs(armPositionDegrees - armPositionToCheckDegrees) <= armMarginDegrees;
+    return Math.abs(armPositionDegrees - armPositionToCheckDegrees) <= ArmCal.ARM_MARGIN_DEGREES;
   }
 
   @Override
