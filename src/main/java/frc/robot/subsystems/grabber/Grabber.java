@@ -24,7 +24,7 @@ public class Grabber extends SubsystemBase {
   private boolean runningCommand = false;
 
   public void spinMotors(double power) {
-    runningCommand = Math.abs(power)<0.01?false:true;
+    runningCommand = !(Math.abs(power)<0.01);
     frontMotor.set(power);
   }
 
