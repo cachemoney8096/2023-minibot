@@ -34,7 +34,7 @@ public class ModuleConstants {
 
   public static final int DRIVING_MOTOR_CURRENT_LIMIT_AMPS = 50;
 
-  public static final double TURNING_ENCODER_POSITION_PID_MIN_INPUT_RADIANS = 0; // radians
+  public static final double TURNING_ENCODER_POSITION_PID_MIN_INPUT_RADIANS = 0.0; // radians
   public static final double TURNING_ENCODER_POSITION_PID_MAX_INPUT_RADIANS =
       2 * Math.PI; // radians
 
@@ -43,5 +43,5 @@ public class ModuleConstants {
   public static final boolean TURNING_SPARK_MAX_INVERTED = false;
   public static final boolean DRIVING_SPARK_MAX_INVERTED = true;
 
-  public static final double TURNING_ENCODER_GEAR_RATIO = 46.2;
+  public static final double TURNING_ENCODER_GEAR_RATIO = 1.0;
 }

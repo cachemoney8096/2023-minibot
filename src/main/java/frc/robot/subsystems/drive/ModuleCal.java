@@ -11,7 +11,7 @@ public class ModuleCal {
 
   /** Values from 2023 */
   public static final double TURNING_P = 0.8,
-      TURNING_I = PLACEHOLDER_DOUBLE,
+      TURNING_I = 0.0,
       TURNING_D = 0.1,
       TURNING_FF = 0.0;
   public static final double DRIVING_MIN_OUPTUT = -1.0, DRIVING_MAX_OUTPUT = 1.0;

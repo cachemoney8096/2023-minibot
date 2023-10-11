@@ -55,13 +55,13 @@ public class DriveSubsystem extends SubsystemBase {
           RobotMap.FRONT_RIGHT_STEERING_MOTOR_CAN_ID,
           DriveCal.FRONT_RIGHT_CHASSIS_ANGULAR_OFFSET_RAD);
 
-  public final SwerveModule rearLeft =
+  public final SwerveModule backLeft =
       new SwerveModule(
           RobotMap.BACK_LEFT_DRIVE_MOTOR_CAN_ID,
           RobotMap.BACK_LEFT_STEERING_MOTOR_CAN_ID,
           DriveCal.BACK_LEFT_CHASSIS_ANGULAR_OFFSET_RAD);
 
-  public final SwerveModule rearRight =
+  public final SwerveModule backRight =
       new SwerveModule(
           RobotMap.BACK_RIGHT_DRIVE_MOTOR_CAN_ID,
           RobotMap.BACK_RIGHT_STEERING_MOTOR_CAN_ID,
@@ -109,8 +109,8 @@ public class DriveSubsystem extends SubsystemBase {
     // Update the odometry in the periodic block
     frontLeft.periodic();
     frontRight.periodic();
-    rearLeft.periodic();
-    rearRight.periodic();
+    backLeft.periodic();
+    backRight.periodic();
     odometry.update(Rotation2d.fromDegrees(gyro.getYaw()), getModulePositions());
   }
 
@@ -118,16 +118,16 @@ public class DriveSubsystem extends SubsystemBase {
     return new SwerveModulePosition[] {
       frontLeft.getPosition(),
       frontRight.getPosition(),
-      rearLeft.getPosition(),
-      rearRight.getPosition()
+      backLeft.getPosition(),
+      backRight.getPosition()
     };
   }
 
   public void burnFlashSparks() {
     frontLeft.burnFlashSparks();
     frontRight.burnFlashSparks();
-    rearLeft.burnFlashSparks();
-    rearRight.burnFlashSparks();
+    backLeft.burnFlashSparks();
+    backRight.burnFlashSparks();
   }
 
   /**
@@ -190,12 +190,12 @@ public class DriveSubsystem extends SubsystemBase {
   public void setNoMove() {
     Rotation2d frontLeftCurrRot = frontLeft.getPosition().angle;
     Rotation2d frontRightCurrRot = frontRight.getPosition().angle;
-    Rotation2d rearLeftCurrRot = rearLeft.getPosition().angle;
-    Rotation2d rearRightCurrRot = rearRight.getPosition().angle;
+    Rotation2d backLeftCurrRot = backLeft.getPosition().angle;
+    Rotation2d backRightCurrRot = backRight.getPosition().angle;
     frontLeft.setDesiredState(new SwerveModuleState(0, frontLeftCurrRot));
     frontRight.setDesiredState(new SwerveModuleState(0, frontRightCurrRot));
-    rearLeft.setDesiredState(new SwerveModuleState(0, rearLeftCurrRot));
-    rearRight.setDesiredState(new SwerveModuleState(0, rearRightCurrRot));
+    backLeft.setDesiredState(new SwerveModuleState(0, backLeftCurrRot));
+    backRight.setDesiredState(new SwerveModuleState(0, backRightCurrRot));
   }
 
   /**
@@ -247,8 +247,8 @@ public class DriveSubsystem extends SubsystemBase {
         swerveModuleStates, DriveConstants.MAX_SPEED_METERS_PER_SECOND);
     frontLeft.setDesiredState(swerveModuleStates[0]);
     frontRight.setDesiredState(swerveModuleStates[1]);
-    rearLeft.setDesiredState(swerveModuleStates[2]);
-    rearRight.setDesiredState(swerveModuleStates[3]);
+    backLeft.setDesiredState(swerveModuleStates[2]);
+    backRight.setDesiredState(swerveModuleStates[3]);
   }
 
   /** Sets the wheels into an X formation to prevent movement. */
@@ -256,8 +256,8 @@ public class DriveSubsystem extends SubsystemBase {
     lights.setPartyMode();
     frontLeft.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(45)));
     frontRight.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(-45)));
-    rearLeft.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(-45)));
-    rearRight.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(45)));
+    backLeft.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(-45)));
+    backRight.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(45)));
     targetHeadingDegrees = getHeadingDegrees();
   }
 
@@ -271,16 +271,16 @@ public class DriveSubsystem extends SubsystemBase {
         desiredStates, DriveConstants.MAX_SPEED_METERS_PER_SECOND);
     frontLeft.setDesiredState(desiredStates[0]);
     frontRight.setDesiredState(desiredStates[1]);
-    rearLeft.setDesiredState(desiredStates[2]);
-    rearRight.setDesiredState(desiredStates[3]);
+    backLeft.setDesiredState(desiredStates[2]);
+    backRight.setDesiredState(desiredStates[3]);
   }
 
   /** Resets the drive encoders to currently read a position of 0. */
   public void resetDrivingEncoders() {
     frontLeft.resetDrivingEncoders();
-    rearLeft.resetDrivingEncoders();
+    backLeft.resetDrivingEncoders();
     frontRight.resetDrivingEncoders();
-    rearRight.resetDrivingEncoders();
+    backRight.resetDrivingEncoders();
   }
 
   /**
@@ -357,8 +357,8 @@ public class DriveSubsystem extends SubsystemBase {
   public void setForward() {
     frontLeft.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(0)));
     frontRight.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(0)));
-    rearLeft.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(0)));
-    rearRight.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(0)));
+    backLeft.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(0)));
+    backRight.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(0)));
   }
 
   public WPI_Pigeon2 getGyro() {
@@ -369,12 +369,6 @@ public class DriveSubsystem extends SubsystemBase {
   public Command followTrajectoryCommand(PathPlannerTrajectory traj, boolean isFirstPath) {
 
     return new SequentialCommandGroup(
-            new RunCommand(() -> setForward())
-                .withTimeout(0.1)
-                .unless(
-                    () -> {
-                      return !isFirstPath;
-                    }),
             new InstantCommand(
                 () -> {
                   // Reset odometry for the first path you run during auto
@@ -541,16 +535,16 @@ public class DriveSubsystem extends SubsystemBase {
         "New Zero for Front Right Swerve: " + DriveCal.SWERVE_FRONT_RIGHT_ANGULAR_OFFSET_RAD);
   }
 
-  public void zeroRearLeftAtCurrentPos() {
-    DriveCal.SWERVE_BACK_LEFT_ANGULAR_OFFSET_RAD = rearLeft.getTurningEncoderAbsPositionRad();
+  public void zeroBackLeftAtCurrentPos() {
+    DriveCal.SWERVE_BACK_LEFT_ANGULAR_OFFSET_RAD = backLeft.getTurningEncoderAbsPositionRad();
     System.out.println(
-        "New Zero for Rear Left Swerve: " + DriveCal.SWERVE_BACK_LEFT_ANGULAR_OFFSET_RAD);
+        "New Zero for Back Left Swerve: " + DriveCal.SWERVE_BACK_LEFT_ANGULAR_OFFSET_RAD);
   }
 
-  public void zeroRearRightAtCurrentPos() {
-    DriveCal.SWERVE_BACK_RIGHT_ANGULAR_OFFSET_RAD = rearRight.getTurningEncoderAbsPositionRad();
+  public void zeroBackRightAtCurrentPos() {
+    DriveCal.SWERVE_BACK_RIGHT_ANGULAR_OFFSET_RAD = backRight.getTurningEncoderAbsPositionRad();
     System.out.println(
-        "New Zero for Rear Right Swerve: " + DriveCal.SWERVE_BACK_RIGHT_ANGULAR_OFFSET_RAD);
+        "New Zero for Back Right Swerve: " + DriveCal.SWERVE_BACK_RIGHT_ANGULAR_OFFSET_RAD);
   }
 
   @Override
@@ -562,8 +556,8 @@ public class DriveSubsystem extends SubsystemBase {
     addChild("Rotate to target controller", DriveCal.ROTATE_TO_TARGET_PID_CONTROLLER);
     addChild("Front Right", frontRight);
     addChild("Front Left", frontLeft);
-    addChild("Rear Right", rearRight);
-    addChild("Rear Left", rearLeft);
+    addChild("Back Right", backRight);
+    addChild("Back Left", backLeft);
     builder.addDoubleProperty("Filtered pitch deg", this::getFilteredPitch, null);
     builder.addDoubleProperty(
         "Throttle multiplier",
@@ -587,24 +581,24 @@ public class DriveSubsystem extends SubsystemBase {
     builder.addDoubleProperty(
         "Front Right Abs Encoder (rad)", frontRight::getTurningEncoderAbsPositionRad, null);
     builder.addDoubleProperty(
-        "Rear Left Abs Encoder (rad)", rearLeft::getTurningEncoderAbsPositionRad, null);
+        "Back Left Abs Encoder (rad)", backLeft::getTurningEncoderAbsPositionRad, null);
     builder.addDoubleProperty(
-        "Rear Right Abs Encoder (rad)", rearRight::getTurningEncoderAbsPositionRad, null);
+        "Back Right Abs Encoder (rad)", backRight::getTurningEncoderAbsPositionRad, null);
     builder.addDoubleProperty(
         "Front Left Module Pos (rad)", () -> frontLeft.getPosition().angle.getRadians(), null);
     builder.addDoubleProperty(
         "Front Right Module Pos (rad)", () -> frontRight.getPosition().angle.getRadians(), null);
     builder.addDoubleProperty(
-        "Rear Left Module Pos (rad)", () -> rearLeft.getPosition().angle.getRadians(), null);
+        "Back Left Module Pos (rad)", () -> backLeft.getPosition().angle.getRadians(), null);
     builder.addDoubleProperty(
-        "Rear Right Module Pos (rad)", () -> rearRight.getPosition().angle.getRadians(), null);
+        "Back Right Module Pos (rad)", () -> backRight.getPosition().angle.getRadians(), null);
     builder.addDoubleProperty(
         "Front Left Distance (m)", () -> frontLeft.getPosition().distanceMeters, null);
     builder.addDoubleProperty(
         "Front Right Distance (m)", () -> frontRight.getPosition().distanceMeters, null);
     builder.addDoubleProperty(
-        "Rear Left Distance (m)", () -> rearLeft.getPosition().distanceMeters, null);
+        "Back Left Distance (m)", () -> backLeft.getPosition().distanceMeters, null);
     builder.addDoubleProperty(
-        "Rear Right Distance (m)", () -> rearRight.getPosition().distanceMeters, null);
+        "Back Right Distance (m)", () -> backRight.getPosition().distanceMeters, null);
   }
 }
