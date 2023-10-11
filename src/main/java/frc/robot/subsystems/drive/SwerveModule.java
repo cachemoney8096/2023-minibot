@@ -16,8 +16,6 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.Timer;
-import frc.robot.Calibrations;
-import frc.robot.Constants;
 import frc.robot.utils.AbsoluteEncoderChecker;
 import frc.robot.utils.SparkMaxUtils;
 
@@ -35,8 +33,7 @@ public class SwerveModule implements Sendable {
   private double chassisAngularOffsetRadians = 0.0;
   private SwerveModuleState desiredState =
       new SwerveModuleState(
-          ModuleConstants.DRIVING_ENCODER_VELOCITY_FACTOR_METERS_PER_SECOND,
-          new Rotation2d());
+          ModuleConstants.DRIVING_ENCODER_VELOCITY_FACTOR_METERS_PER_SECOND, new Rotation2d());
 
   /**
    * Constructs a SwerveModule and configures the driving and turning motor, encoder, and PID
@@ -82,8 +79,7 @@ public class SwerveModule implements Sendable {
     turningPidTmp.setI(ModuleCal.TURNING_I);
     turningPidTmp.setD(ModuleCal.TURNING_D);
     turningPidTmp.setFF(ModuleCal.TURNING_FF);
-    turningPidTmp.setOutputRange(
-        ModuleCal.TURNING_MIN_OUTPUT, ModuleCal.TURNING_MAX_OUTPUT);
+    turningPidTmp.setOutputRange(ModuleCal.TURNING_MIN_OUTPUT, ModuleCal.TURNING_MAX_OUTPUT);
     turningSparkMax.setIdleMode(ModuleConstants.TURNING_MOTOR_IDLE_MODE);
     turningSparkMax.setSmartCurrentLimit(ModuleConstants.TURNING_MOTOR_CURRENT_LIMIT_AMPS);
   }
@@ -102,8 +98,7 @@ public class SwerveModule implements Sendable {
     drivingPidTmp.setI(ModuleCal.DRIVING_I);
     drivingPidTmp.setD(ModuleCal.DRIVING_D);
     drivingPidTmp.setFF(ModuleCal.DRIVING_FF);
-    drivingPidTmp.setOutputRange(
-        ModuleCal.DRIVING_MIN_OUPTUT, ModuleCal.DRIVING_MAX_OUTPUT);
+    drivingPidTmp.setOutputRange(ModuleCal.DRIVING_MIN_OUPTUT, ModuleCal.DRIVING_MAX_OUTPUT);
     drivingEncoderTmp.setPositionConversionFactor(
         ModuleConstants.DRIVING_ENCODER_POSITION_FACTOR_METERS);
     drivingEncoderTmp.setVelocityConversionFactor(

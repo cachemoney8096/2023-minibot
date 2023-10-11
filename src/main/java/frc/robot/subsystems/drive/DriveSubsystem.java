@@ -85,12 +85,8 @@ public class DriveSubsystem extends SubsystemBase {
 
   private BooleanSupplier isTimedMatch;
 
-  /**
-   * Creates a new DriveSubsystem.
-   */
-  public DriveSubsystem(
-      Lights lightsSubsystem,
-      BooleanSupplier isTimedMatchFunc) {
+  /** Creates a new DriveSubsystem. */
+  public DriveSubsystem(Lights lightsSubsystem, BooleanSupplier isTimedMatchFunc) {
     gyro.configFactoryDefault();
     gyro.reset();
     gyro.configMountPose(AxisDirection.PositiveY, AxisDirection.PositiveZ);

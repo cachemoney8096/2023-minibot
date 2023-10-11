@@ -24,7 +24,7 @@ import frc.robot.utils.ScoringLocationUtil;
 public class RobotContainer {
   // If true, this is a match with real timings
   public boolean timedMatch = false;
-  
+
   // The robot's subsystems and commands are defined here...
   private final ScoringLocationUtil scoreLoc = new ScoringLocationUtil();
   private Arm arm = new Arm(scoreLoc);
