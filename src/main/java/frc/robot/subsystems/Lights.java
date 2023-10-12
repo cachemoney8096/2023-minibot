@@ -48,7 +48,7 @@ public class Lights extends SubsystemBase {
     setLEDs();
   }
 
-  public void setLEDs() {
+  private void setLEDs() {
     if (currentLightStatus == LightCode.PARTY_MODE) {
       setPartyMode();
     } else if (currentLightStatus == LightCode.NO_TAG) {
@@ -62,7 +62,7 @@ public class Lights extends SubsystemBase {
   }
 
   /** No Tag is an animation that switches between no color and green */
-  public void setNoTag() {
+  private void setNoTag() {
     StrobeAnimation strobeAnim = new StrobeAnimation(0, 255, 0);
     candle.animate(strobeAnim);
   }

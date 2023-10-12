@@ -4,6 +4,7 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotMap;
 import frc.robot.utils.ScoringLocationUtil.ScoreHeight;
@@ -20,6 +21,14 @@ public class Grabber extends SubsystemBase {
       new DigitalInput(RobotMap.GRABBER_GAME_PIECE_SENSOR_DIO);
 
   private boolean runningCommand = false;
+
+  private Command rumbleBriefly;
+
+  private boolean sawObject = true;
+
+  public Grabber(Command rumbleBrieflyCmd) {
+    this.rumbleBriefly = rumbleBrieflyCmd;
+  }
 
   public void spinMotors(double power) {
     runningCommand = !(Math.abs(power) < 0.01);
@@ -51,7 +60,14 @@ public class Grabber extends SubsystemBase {
   }
 
   public boolean seeGamePiece() {
-    return !gamePieceSensor.get();
+    // Sensor is false if there's a game piece
+    boolean seeGamePieceNow = !gamePieceSensor.get();
+    if (!sawObject && seeGamePieceNow) {
+      rumbleBriefly.schedule();
+    }
+
+    sawObject = seeGamePieceNow;
+    return seeGamePieceNow;
   }
 
   public void initSparks() {

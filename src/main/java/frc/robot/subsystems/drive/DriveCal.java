@@ -60,7 +60,7 @@ public class DriveCal {
   public static final double ROTATION_DEADBAND_THRESHOLD = 0.04;
 
   /** Drive speed multipliers for teleop intaking and scoring */
-  public static final double THROTTLE_FOR_INTAKING = 0.55,
+  public static final double THROTTLE_FOR_INTAKING = 1.0,
       THROTTLE_FOR_SCORING_AND_SHELF = 0.35,
       THROTTLE_FOR_SLOW_BUTTON = 0.5;
 
