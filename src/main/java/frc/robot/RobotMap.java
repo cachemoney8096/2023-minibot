@@ -1,6 +1,9 @@
 package frc.robot;
 
 public class RobotMap {
+
+  public static final int DRIVER_CONTROLLER_PORT = 0;
+
   /** Driving Motor CAN IDs */
   public static final int FRONT_LEFT_DRIVE_MOTOR_CAN_ID = Constants.PLACEHOLDER_INT,
       FRONT_RIGHT_DRIVE_MOTOR_CAN_ID = Constants.PLACEHOLDER_INT,

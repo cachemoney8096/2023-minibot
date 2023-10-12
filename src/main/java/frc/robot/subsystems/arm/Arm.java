@@ -43,6 +43,7 @@ public class Arm extends SubsystemBase {
   public ScoringLocationUtil scoreLoc;
   private ArmPosition desiredPosition = ArmPosition.STARTING;
   public boolean isScoring = false;
+  public boolean cancelledScore = false;
 
   TreeMap<ArmPosition, Double> armPositionMap;
 
@@ -189,7 +190,16 @@ public class Arm extends SubsystemBase {
   /** Cancellation function */
   public void cancelScore() {
     goToPosition(ArmPosition.STARTING);
+    setCancelScore(true);
     isScoring = false;
+  }
+
+  public void setCancelScore(boolean cancelScore) {
+    cancelledScore = cancelScore;
+  }
+
+  public boolean getCancelScore() {
+    return cancelledScore;
   }
 
   /** Output if we are scoring or not */

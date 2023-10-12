@@ -519,6 +519,10 @@ public class DriveSubsystem extends SubsystemBase {
         .withTimeout(timeoutSec);
   }
 
+  public void rezeroGyro() {
+    gyro.reset();
+  }
+
   public void zeroFrontLeftAtCurrentPos() {
     DriveCal.SWERVE_FRONT_LEFT_ANGULAR_OFFSET_RAD = frontLeft.getTurningEncoderAbsPositionRad();
     System.out.println(

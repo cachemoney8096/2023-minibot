@@ -26,8 +26,7 @@ public class ArmCal {
       ARM_INTAKE_POSITION_DEG = 80.0,
       ARM_LOW_POSITION_DEG = 270.0,
       ARM_HIGH_MID_POSITION_DEG = 210.0,
-      ARM_AVOID_LIMELIGHT_POSITION_DEG = 250.0,
-      ARM_OUTTAKE_POSITION_DEG = 270.0;
+      ARM_AVOID_LIMELIGHT_POSITION_DEG = 250.0;
 
   /** Absolute encoder position when the arm is at 0 degrees */
   public static double armAbsoluteEncoderZeroPosDeg = PLACEHOLDER_DOUBLE;
