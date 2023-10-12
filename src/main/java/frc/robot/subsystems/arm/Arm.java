@@ -94,7 +94,7 @@ public class Arm extends SubsystemBase {
     return getArmAngle() - ArmConstants.ARM_POSITION_WHEN_HORIZONTAL_DEGREES;
   }
   /** Returns the arm angle with the zero value applied */
-  public double getArmAngle(){
+  public double getArmAngle() {
     return armEncoder.getPosition() - ArmCal.armAbsoluteEncoderZeroPosDeg;
   }
 
@@ -104,11 +104,11 @@ public class Arm extends SubsystemBase {
     desiredPosition = pos;
   }
 
-  /** Approach desired arm position */ 
-  public void approachDesiredPosition(){
+  /** Approach desired arm position */
+  public void approachDesiredPosition() {
     double armDemandVoltsA = armController.calculate(getArmAngle());
     double armDemandVoltsB =
-    ArmCal.ARM_FEEDFORWARD.calculate(
+        ArmCal.ARM_FEEDFORWARD.calculate(
             getArmAngleRelativeToHorizontal(), armController.getSetpoint().velocity);
     armMotor.setVoltage(armDemandVoltsA + armDemandVoltsB);
     SmartDashboard.putNumber("Arm PID", armDemandVoltsA);
