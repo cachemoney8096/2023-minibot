@@ -5,10 +5,7 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.RobotMap;
 import frc.robot.utils.ScoringLocationUtil.ScoreHeight;
 
@@ -24,8 +21,10 @@ public class Grabber extends SubsystemBase {
       new DigitalInput(RobotMap.GRABBER_GAME_PIECE_SENSOR_DIO);
 
   private boolean runningCommand = false;
-  
+
   private Command rumbleBriefly;
+
+  private boolean sawObject = true;
 
   public Grabber(Command rumbleBrieflyCmd) {
     this.rumbleBriefly = rumbleBrieflyCmd;
@@ -61,11 +60,14 @@ public class Grabber extends SubsystemBase {
   }
 
   public boolean seeGamePiece() {
-    boolean seeGamePiece = !gamePieceSensor.get();
-    if (seeGamePiece) {
+    // Sensor is false if there's a game piece
+    boolean seeGamePieceNow = !gamePieceSensor.get();
+    if (!sawObject && seeGamePieceNow) {
       rumbleBriefly.schedule();
     }
-    return seeGamePiece;
+
+    sawObject = seeGamePieceNow;
+    return seeGamePieceNow;
   }
 
   public void initSparks() {
