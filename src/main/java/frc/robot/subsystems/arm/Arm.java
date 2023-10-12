@@ -84,21 +84,29 @@ public class Arm extends SubsystemBase {
   /** True if the arm is at the queried position. */
   public boolean atPosition(ArmPosition positionToCheck) {
     double armPositionToCheckDegrees = armPositionMap.get(positionToCheck);
-    double armPositionDegrees = armEncoder.getPosition();
+    double armPositionDegrees = getArmAngle();
 
     return Math.abs(armPositionDegrees - armPositionToCheckDegrees) <= ArmCal.ARM_MARGIN_DEGREES;
   }
 
   /** Returns the arm angle in degrees off of the horizontal. */
   public double getArmAngleRelativeToHorizontal() {
-    return armEncoder.getPosition() - ArmConstants.ARM_POSITION_WHEN_HORIZONTAL_DEGREES;
+    return getArmAngle() - ArmConstants.ARM_POSITION_WHEN_HORIZONTAL_DEGREES;
+  }
+  /** Returns the arm angle with the zero value applied */
+  public double getArmAngle() {
+    return armEncoder.getPosition() - ArmCal.armAbsoluteEncoderZeroPosDeg;
   }
 
-  /** Sends voltage commands to the arm and elevator motors */
+  /** Sends set the goal and desired information */
   public void goToPosition(ArmPosition pos) {
     armController.setGoal(armPositionMap.get(pos));
     desiredPosition = pos;
-    double armDemandVoltsA = armController.calculate(armEncoder.getPosition());
+  }
+
+  /** Approach desired arm position */
+  public void approachDesiredPosition() {
+    double armDemandVoltsA = armController.calculate(getArmAngle());
     double armDemandVoltsB =
         ArmCal.ARM_FEEDFORWARD.calculate(
             getArmAngleRelativeToHorizontal(), armController.getSetpoint().velocity);
@@ -169,12 +177,14 @@ public class Arm extends SubsystemBase {
   /** True if the arm is at the queried position. */
   public boolean atDesiredArmPosition() {
     double armPositionToCheckDegrees = armPositionMap.get(desiredPosition);
-    double armPositionDegrees = armEncoder.getPosition();
+    double armPositionDegrees = getArmAngle();
     return Math.abs(armPositionDegrees - armPositionToCheckDegrees) <= ArmCal.ARM_MARGIN_DEGREES;
   }
 
   @Override
-  public void periodic() {}
+  public void periodic() {
+    approachDesiredPosition();
+  }
 
   /** Cancellation function */
   public void cancelScore() {
