@@ -12,14 +12,11 @@ import frc.robot.subsystems.grabber.GrabberCalibrations;
 public class FinishScore extends SequentialCommandGroup {
   public FinishScore(Arm arm, Grabber grabber, Lights lights) {
     addRequirements(arm, grabber, lights);
-    if (arm.currentlyScoring()) {
-      addCommands(
-          new InstantCommand(() -> grabber.score(arm.getScoreHeight())),
-          new WaitCommand(GrabberCalibrations.SCORING_WAIT_TIME),
-          new InstantCommand(() -> grabber.stopMotors()),
-          new InstantCommand(() -> arm.goToPosition(ArmPosition.STARTING)),
-          new InstantCommand(() -> arm.setScoring(false)),
-          new InstantCommand(() -> lights.toggleCode(Lights.LightCode.OFF)));
-    }
+    addCommands(
+        new InstantCommand(() -> grabber.score(arm.getScoreHeight())),
+        new WaitCommand(GrabberCalibrations.SCORING_WAIT_TIME),
+        new InstantCommand(() -> grabber.stopMotors()),
+        new InstantCommand(() -> arm.goToPosition(ArmPosition.STARTING)),
+        new InstantCommand(() -> lights.toggleCode(Lights.LightCode.OFF)));
   }
 }

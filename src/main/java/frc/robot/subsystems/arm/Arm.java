@@ -42,7 +42,6 @@ public class Arm extends SubsystemBase {
 
   public ScoringLocationUtil scoreLoc;
   private ArmPosition desiredPosition = ArmPosition.STARTING;
-  public boolean isScoring = false;
   public boolean cancelledScore = false;
 
   TreeMap<ArmPosition, Double> armPositionMap;
@@ -73,7 +72,6 @@ public class Arm extends SubsystemBase {
 
   /** Sets the desired position */
   public void startScore() {
-    isScoring = true;
     if (scoreLoc.getScoreHeight() == ScoreHeight.HIGH
         || scoreLoc.getScoreHeight() == ScoreHeight.MID) {
       goToPosition(ArmPosition.SCORE_MID_HIGH);
@@ -189,9 +187,7 @@ public class Arm extends SubsystemBase {
 
   /** Cancellation function */
   public void cancelScore() {
-    goToPosition(ArmPosition.STARTING);
     setCancelScore(true);
-    isScoring = false;
   }
 
   public void setCancelScore(boolean cancelScore) {
@@ -200,16 +196,6 @@ public class Arm extends SubsystemBase {
 
   public boolean getCancelScore() {
     return cancelledScore;
-  }
-
-  /** Output if we are scoring or not */
-  public boolean currentlyScoring() {
-    return isScoring;
-  }
-
-  /** Set whether we are scoring */
-  public void setScoring(boolean scoring) {
-    isScoring = scoring;
   }
 
   /** Does all the initialization for the sparks */
@@ -255,7 +241,7 @@ public class Arm extends SubsystemBase {
 
     builder.addDoubleProperty(
         "Arm Abs Position (deg)", armAbsoluteEncoder::getPosition, armEncoder::setPosition);
-    builder.addBooleanProperty("Is scoring", this::currentlyScoring, this::setScoring);
+    builder.addBooleanProperty("Is cancelled", this::getCancelScore, this::setCancelScore);
     builder.addDoubleProperty(
         "Arm Position (deg)", armEncoder::getPosition, armEncoder::setPosition);
     builder.addDoubleProperty("Arm Vel (deg/s)", armEncoder::getVelocity, null);

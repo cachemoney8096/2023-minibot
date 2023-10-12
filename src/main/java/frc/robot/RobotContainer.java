@@ -4,8 +4,8 @@
 
 package frc.robot;
 
-import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
@@ -39,15 +39,6 @@ public class RobotContainer {
   // If true, this is a match with real timings
   public boolean timedMatch = false;
 
-  // The robot's subsystems and commands are defined here...
-  private final ScoringLocationUtil scoreLoc = new ScoringLocationUtil();
-  private Arm arm = new Arm(scoreLoc);
-  private ClawLimelight clawLimelight = new ClawLimelight();
-  private Grabber grabber = new Grabber();
-  private Lights lights = new Lights();
-  private TagLimelight tagLimelight = new TagLimelight();
-  private DriveSubsystem drive = new DriveSubsystem(lights, () -> timedMatch);
-
   private final CommandXboxController driverController =
       new CommandXboxController(RobotMap.DRIVER_CONTROLLER_PORT);
 
@@ -62,6 +53,15 @@ public class RobotContainer {
               () -> {
                 driverController.getHID().setRumble(RumbleType.kBothRumble, 0.0);
               }));
+
+  // The robot's subsystems and commands are defined here...
+  private final ScoringLocationUtil scoreLoc = new ScoringLocationUtil();
+  private Arm arm = new Arm(scoreLoc);
+  private ClawLimelight clawLimelight = new ClawLimelight();
+  private Grabber grabber = new Grabber(rumbleBriefly);
+  private Lights lights = new Lights();
+  private TagLimelight tagLimelight = new TagLimelight();
+  private DriveSubsystem drive = new DriveSubsystem(lights, () -> timedMatch);
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
 
@@ -126,7 +126,7 @@ public class RobotContainer {
 
     driverController.start().onTrue(new InstantCommand(lights::setPartyMode, lights));
 
-    driverController.back().onTrue(new InstantCommand(drive::rezeroGyro, drive));
+    driverController.back().onTrue(new InstantCommand(drive::resetYaw, drive));
 
     driverController
         .leftTrigger()
@@ -142,10 +142,8 @@ public class RobotContainer {
                       drive.throttle(1.0);
                     }));
 
-    // technically, left bumper should be go to intake position (according to the sheet)
     driverController.leftBumper().onTrue(new InstantCommand(arm::cancelScore, arm));
 
-    // technically, the x button should be auto-align grid
     driverController
         .x()
         .onTrue(
