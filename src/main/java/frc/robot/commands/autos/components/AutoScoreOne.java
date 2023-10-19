@@ -19,8 +19,8 @@ public class AutoScoreOne extends SequentialCommandGroup {
     addCommands(
         new InstantCommand(() -> arm.startScore()),
         new ConditionalCommand(
-          new WaitUntilCommand(() -> arm.atPosition(ArmPosition.SCORE_MID_HIGH)).withTimeout(ArmCal.START_TO_PRESCORE_MID_HIGH_SEC),
-          new WaitUntilCommand(() -> arm.atPosition(ArmPosition.SCORE_LOW)).withTimeout(ArmCal.START_TO_PRESCORE_LOW_SEC),
+          new WaitUntilCommand(() -> arm.atDesiredArmPosition()).withTimeout(ArmCal.START_TO_PRESCORE_MID_HIGH_SEC),
+          new WaitUntilCommand(() -> arm.atDesiredArmPosition()).withTimeout(ArmCal.START_TO_PRESCORE_LOW_SEC),
             () -> {
               return arm.getScoreHeight() == ScoreHeight.HIGH
                   || arm.getScoreHeight() == ScoreHeight.MID;
