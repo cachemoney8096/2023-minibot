@@ -152,6 +152,10 @@ public class Arm extends SubsystemBase {
     return scoreLoc.getScoreHeight();
   }
 
+  public void setScoreHeight(ScoreHeight height) {
+    scoreLoc.setScoreHeight(height);
+  }
+
   public void zeroArmAtCurrentPos() {
     ArmCal.armAbsoluteEncoderZeroPosDeg = armAbsoluteEncoder.getPosition();
     System.out.println("New Zero for Arm: " + ArmCal.armAbsoluteEncoderZeroPosDeg);
