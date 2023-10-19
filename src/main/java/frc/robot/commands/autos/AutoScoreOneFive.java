@@ -24,7 +24,6 @@ public class AutoScoreOneFive extends SequentialCommandGroup {
               DriveCal.MAX_LINEAR_ACCELERATION_METERS_PER_SEC_SQ));
 
   private HashMap<String, Command> eventMap = new HashMap<>();
-  /* To-do: put events into event map  */
   public AutoScoreOneFive(DriveSubsystem drive, Arm arm, Grabber grabber, Lights lights) {
     eventMap.put(
         "intakeGamePiece", IntakeSequence.interruptibleIntakeSequence(arm, grabber, lights));
