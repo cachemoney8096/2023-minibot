@@ -9,8 +9,8 @@ public final class Calibrations {
 
   public static final class AutoBalance {
     public static final double CHARGE_STATION_PITCH_DEGREES_TO_NORM_VELOCITY = PLACEHOLDER_DOUBLE,
-      CHARGE_STATION_DEADBAND_NORM_VELOCITY = PLACEHOLDER_DOUBLE;
-    
+        CHARGE_STATION_DEADBAND_NORM_VELOCITY = PLACEHOLDER_DOUBLE;
+
     public static final double SET_X_TIME_LEFT_SECONDS = PLACEHOLDER_DOUBLE;
   }
 }

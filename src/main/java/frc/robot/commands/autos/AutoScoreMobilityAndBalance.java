@@ -10,12 +10,14 @@ import frc.robot.subsystems.grabber.Grabber;
 
 /* Scores the initial game piece, drives over (mobility), comes back and balances */
 public class AutoScoreMobilityAndBalance extends SequentialCommandGroup {
-    public static final double DISTANCE_UP_CHARGE_STATION_METERS = 4.5;
-    public static final double DISTANCE_BACK_CHARGE_STATION_METERS = 3.15;
-    public AutoScoreMobilityAndBalance(Arm arm, Grabber grabber, Lights lights, DriveSubsystem drive) {
-        addCommands(
-            new AutoScoreOne(true, arm, grabber, lights),
-            new AutoMobilityChargeStationSequence(drive, DISTANCE_UP_CHARGE_STATION_METERS, DISTANCE_BACK_CHARGE_STATION_METERS)
-        );  
-    }
+  public static final double DISTANCE_UP_CHARGE_STATION_METERS = 4.5;
+  public static final double DISTANCE_BACK_CHARGE_STATION_METERS = 3.15;
+
+  public AutoScoreMobilityAndBalance(
+      Arm arm, Grabber grabber, Lights lights, DriveSubsystem drive) {
+    addCommands(
+        new AutoScoreOne(true, arm, grabber, lights),
+        new AutoMobilityChargeStationSequence(
+            drive, DISTANCE_UP_CHARGE_STATION_METERS, DISTANCE_BACK_CHARGE_STATION_METERS));
+  }
 }

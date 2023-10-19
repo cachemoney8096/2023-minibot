@@ -1,7 +1,6 @@
 package frc.robot.commands.autos.components;
 
 import com.ctre.phoenix.sensors.WPI_Pigeon2;
-
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.CommandBase;
@@ -29,10 +28,12 @@ public class AutoChargeStationBalance extends CommandBase {
     double pitchDeg = gyro.getPitch();
 
     /** Velocity is [-1,1] */
-    double normVelocity = pitchDeg * Calibrations.AutoBalance.CHARGE_STATION_PITCH_DEGREES_TO_NORM_VELOCITY;
+    double normVelocity =
+        pitchDeg * Calibrations.AutoBalance.CHARGE_STATION_PITCH_DEGREES_TO_NORM_VELOCITY;
 
     double deadbandedNormVelocity =
-        MathUtil.applyDeadband(normVelocity, Calibrations.AutoBalance.CHARGE_STATION_DEADBAND_NORM_VELOCITY);
+        MathUtil.applyDeadband(
+            normVelocity, Calibrations.AutoBalance.CHARGE_STATION_DEADBAND_NORM_VELOCITY);
 
     /** Time remaining in current match period (auto or teleop) in seconds */
     double matchTime = DriverStation.getMatchTime();
