@@ -20,8 +20,8 @@ public class IntakeSequence extends SequentialCommandGroup {
         new InstantCommand(() -> grabber.intake()),
         new WaitUntilCommand((grabber::seeGamePiece)),
         new InstantCommand(() -> lights.toggleCode(LightCode.GAME_OBJECT)),
-        new InstantCommand(() -> grabber.stopMotors()),
-        new InstantCommand(() -> arm.goToPosition(ArmPosition.STARTING)));
+        new InstantCommand(() -> grabber.stopMotors())
+        );
   }
 
   public static Command interruptibleIntakeSequence(Arm arm, Grabber grabber, Lights lights) {
@@ -29,7 +29,6 @@ public class IntakeSequence extends SequentialCommandGroup {
         .finallyDo(
             (boolean interrupted) -> {
               grabber.stopMotors();
-              arm.goToPosition(ArmPosition.STARTING);
               lights.toggleCode(LightCode.OFF);
             });
   }

@@ -13,8 +13,4 @@ public final class Calibrations {
 
     public static final double SET_X_TIME_LEFT_SECONDS = PLACEHOLDER_DOUBLE;
   }
-
-  public static final class AutoScore {
-    public static final double AUTO_INTAKE_TIMEOUT_SEC = PLACEHOLDER_DOUBLE;
-  }
 }

@@ -97,5 +97,18 @@
       }
     }
   ],
-  "markers": []
+  "markers": [
+    {
+      "position": 0.8822088068181818,
+      "names": [
+        "intakeGamePiece"
+      ]
+    },
+    {
+      "position": 2.441548295454546,
+      "names": [
+        "stopIntaking"
+      ]
+    }
+  ]
 }
