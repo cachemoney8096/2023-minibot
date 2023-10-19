@@ -56,7 +56,10 @@
         "x": 5.672920106256879,
         "y": 4.57669999541388
       },
-      "nextControl": null,
+      "nextControl": {
+        "x": 7.672920106256879,
+        "y": 4.57669999541388
+      },
       "holonomicAngle": 0,
       "isReversal": false,
       "velOverride": null,
@@ -66,6 +69,28 @@
         "names": [
           "intakeGamePiece"
         ],
+        "executionBehavior": "parallel",
+        "waitBehavior": "none",
+        "waitTime": 0
+      }
+    },
+    {
+      "anchorPoint": {
+        "x": 1.7932330031326729,
+        "y": 4.415899373465414
+      },
+      "prevControl": {
+        "x": 2.2854626160641214,
+        "y": 4.419407645238902
+      },
+      "nextControl": null,
+      "holonomicAngle": 0,
+      "isReversal": false,
+      "velOverride": null,
+      "isLocked": false,
+      "isStopPoint": false,
+      "stopEvent": {
+        "names": [],
         "executionBehavior": "parallel",
         "waitBehavior": "none",
         "waitTime": 0
