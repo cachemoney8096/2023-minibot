@@ -32,7 +32,6 @@ public class AutoScoreOneFive extends SequentialCommandGroup {
         new AutoScoreOne(false, arm, grabber, lights),
         new FollowPathWithEvents(
                 drive.followTrajectoryCommand(oneFive, true), oneFive.getMarkers(), eventMap)
-            .withTimeout(2.56)
         );
   }
 }
