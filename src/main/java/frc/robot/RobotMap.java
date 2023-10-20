@@ -14,17 +14,17 @@ public class RobotMap {
       BACK_RIGHT_STEERING_MOTOR_CAN_ID = 15;
 
   /** Arm Pivot Motor CAN ID */
-  public static final int ARM_PIVOT_MOTOR_CAN_ID = Constants.PLACEHOLDER_INT;
+  public static final int ARM_PIVOT_MOTOR_CAN_ID = 5;
 
   /** Intake Roller Motor CAN IDs */
-  public static final int FRONT_INTAKE_ROLLER_MOTOR_CAN_ID = Constants.PLACEHOLDER_INT,
-      BACK_INTAKE_ROLLER_MOTOR_CAN_ID = Constants.PLACEHOLDER_INT;
+  public static final int FRONT_INTAKE_ROLLER_MOTOR_CAN_ID = 9,
+      BACK_INTAKE_ROLLER_MOTOR_CAN_ID = 10;
 
   /** CANdle for the lights */
   public static final int CANDLE_CAN_ID = Constants.PLACEHOLDER_INT;
 
   /** Pigeon Gyro CAN ID */
-  public static final int PIGEON_CAN_ID = Constants.PLACEHOLDER_INT;
+  public static final int PIGEON_CAN_ID = 0;
 
   /** Channel for the game piece sensor */
   public static final int GRABBER_GAME_PIECE_SENSOR_DIO = 0;
