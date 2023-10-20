@@ -51,9 +51,8 @@ public class AutoScoreTwo extends SequentialCommandGroup {
         new FollowPathWithEvents(
                 drive.followTrajectoryCommand(trajNewGamePiece, true),
                 trajNewGamePiece.getMarkers(),
-                eventMap)
-            .andThen(
+                eventMap),
                 new InstantCommand(() -> arm.setScoreHeight(ScoreHeight.MID)),
-                new AutoScoreOne(fast, arm, grabber, lights)));
+                new AutoScoreOne(fast, arm, grabber, lights));
   }
 }

@@ -48,6 +48,5 @@ public class ArmCal {
   /** Various timeouts for auto lift movements */
   public static final double SCORE_TO_START_FAST_SEC = PLACEHOLDER_DOUBLE,
       SCORE_TO_START_SEC = PLACEHOLDER_DOUBLE,
-      START_TO_PRESCORE_MID_HIGH_SEC = PLACEHOLDER_DOUBLE,
-      START_TO_PRESCORE_LOW_SEC = PLACEHOLDER_DOUBLE;
+      START_TO_PRESCORE_SEC = 5.0;
 }
