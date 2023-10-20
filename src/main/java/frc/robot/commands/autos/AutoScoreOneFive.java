@@ -24,13 +24,13 @@ public class AutoScoreOneFive extends SequentialCommandGroup {
               DriveCal.MAX_LINEAR_ACCELERATION_METERS_PER_SEC_SQ));
 
   private HashMap<String, Command> eventMap = new HashMap<>();
+
   public AutoScoreOneFive(DriveSubsystem drive, Arm arm, Grabber grabber, Lights lights) {
     eventMap.put(
         "intakeGamePiece", IntakeSequence.interruptibleIntakeSequence(arm, grabber, lights));
     addCommands(
         new AutoScoreOne(false, arm, grabber, lights),
         new FollowPathWithEvents(
-                drive.followTrajectoryCommand(oneFive, true), oneFive.getMarkers(), eventMap)
-        );
+            drive.followTrajectoryCommand(oneFive, true), oneFive.getMarkers(), eventMap));
   }
 }
