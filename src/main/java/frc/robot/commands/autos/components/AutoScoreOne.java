@@ -12,23 +12,12 @@ import frc.robot.subsystems.arm.Arm.ArmPosition;
 import frc.robot.subsystems.arm.ArmCal;
 import frc.robot.subsystems.grabber.Grabber;
 import frc.robot.subsystems.grabber.GrabberCalibrations;
-import frc.robot.utils.ScoringLocationUtil.ScoreHeight;
 
 public class AutoScoreOne extends SequentialCommandGroup {
   public AutoScoreOne(boolean fast, Arm arm, Grabber grabber, Lights lights) {
     addCommands(
         new InstantCommand(() -> arm.startScore()),
-        new ConditionalCommand(
-          new WaitUntilCommand(() -> arm.atDesiredArmPosition()).withTimeout(ArmCal.START_TO_PRESCORE_MID_HIGH_SEC),
-          new WaitUntilCommand(() -> arm.atDesiredArmPosition()).withTimeout(ArmCal.START_TO_PRESCORE_LOW_SEC),
-            () -> {
-              return arm.getScoreHeight() == ScoreHeight.HIGH
-                  || arm.getScoreHeight() == ScoreHeight.MID;
-            }),
-        new InstantCommand(
-            () -> {
-              lights.toggleCode(LightCode.READY_TO_SCORE);
-            }),
+        new WaitUntilCommand(() -> arm.atDesiredArmPosition()).withTimeout(ArmCal.START_TO_PRESCORE_SEC),
         new InstantCommand(() -> grabber.score(arm.getScoreHeight())),
         new WaitCommand(GrabberCalibrations.EJECTION_WAIT_TIME),
         new InstantCommand(() -> arm.goToPosition(ArmPosition.STARTING)),
