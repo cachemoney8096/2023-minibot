@@ -10,7 +10,7 @@ public class RobotMap {
   /** Steering Motor CAN IDs */
   public static final int FRONT_LEFT_STEERING_MOTOR_CAN_ID = 16,
       FRONT_RIGHT_STEERING_MOTOR_CAN_ID = 19,
-      BACK_LEFT_STEERING_MOTOR_CAN_ID = 14,
+      BACK_LEFT_STEERING_MOTOR_CAN_ID = 11,
       BACK_RIGHT_STEERING_MOTOR_CAN_ID = 15;
 
   /** Arm Pivot Motor CAN ID */
