@@ -7,6 +7,9 @@ package frc.robot;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -41,6 +44,7 @@ public class RobotContainer {
 
   private final CommandXboxController driverController =
       new CommandXboxController(RobotMap.DRIVER_CONTROLLER_PORT);
+  // The robot's subsystems and commands are defined here...
 
   Command rumbleBriefly =
       new SequentialCommandGroup(
@@ -54,21 +58,54 @@ public class RobotContainer {
                 driverController.getHID().setRumble(RumbleType.kBothRumble, 0.0);
               }));
 
-  // The robot's subsystems and commands are defined here...
   private final ScoringLocationUtil scoreLoc = new ScoringLocationUtil();
-  private Arm arm = new Arm(scoreLoc);
+  public Arm arm = new Arm(scoreLoc);
   private ClawLimelight clawLimelight = new ClawLimelight();
   private Grabber grabber = new Grabber(rumbleBriefly);
   private Lights lights = new Lights();
   private TagLimelight tagLimelight = new TagLimelight();
-  private DriveSubsystem drive = new DriveSubsystem(lights, () -> timedMatch);
+  public DriveSubsystem drive = new DriveSubsystem(lights, () -> timedMatch);
 
-  // Replace with CommandPS4Controller or CommandJoystick if needed
+  // A chooser for autonomous commands
+  private SendableChooser<Command> autonChooser = new SendableChooser<>();
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     // Configure the trigger bindings
     configureBindings();
+
+    Shuffleboard.getTab("Subsystems").add(arm.getName(), arm);
+    Shuffleboard.getTab("Subsystems").add(clawLimelight.getName(), clawLimelight);
+    Shuffleboard.getTab("Subsystems").add(grabber.getName(), grabber);
+    Shuffleboard.getTab("Subsystems").add(lights.getName(), lights);
+    Shuffleboard.getTab("Subsystems").add(tagLimelight.getName(), tagLimelight);
+    Shuffleboard.getTab("Subsystems").add(drive.getName(), drive);
+  }
+
+  public void initialize() {
+    autonChooser.setDefaultOption("Nothing", new RunCommand(() -> {}, drive, arm));
+
+    // Put the chooser on the dashboard
+    SmartDashboard.putData(autonChooser);
+
+    // Put the buttons for zeroing the mechanisms on the dashboard
+    SmartDashboard.putData(
+        "Zero Arm Based on Current Pos",
+        new InstantCommand(arm::zeroArmAtCurrentPos, arm).ignoringDisable(true));
+    SmartDashboard.putData(
+        "Zero Front Left Based on Current Pos",
+        new InstantCommand(drive::zeroFrontLeftAtCurrentPos, drive).ignoringDisable(true));
+    SmartDashboard.putData(
+        "Zero Front Right Based on Current Pos",
+        new InstantCommand(drive::zeroFrontRightAtCurrentPos, drive).ignoringDisable(true));
+    SmartDashboard.putData(
+        "Zero Rear Left Based on Current Pos",
+        new InstantCommand(drive::zeroBackLeftAtCurrentPos, drive).ignoringDisable(true));
+    SmartDashboard.putData(
+        "Zero Rear Right Based on Current Pos",
+        new InstantCommand(drive::zeroBackRightAtCurrentPos, drive).ignoringDisable(true));
+
+    burnFlashSparks();
   }
 
   /**
@@ -85,6 +122,8 @@ public class RobotContainer {
   public void burnFlashSparks() {
     Timer.delay(0.25);
     arm.burnFlashSparks();
+    drive.burnFlashSparks();
+    grabber.burnFlashSparks();
   }
 
   /**
@@ -180,5 +219,7 @@ public class RobotContainer {
    *
    * @return the command to run in autonomous
    */
-  // public Command getAutonomousCommand() {}
+  public Command getAutonomousCommand() {
+    return autonChooser.getSelected();
+  }
 }

@@ -4,6 +4,7 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotMap;
@@ -76,6 +77,16 @@ public class Grabber extends SubsystemBase {
     backMotor.follow(frontMotor);
     frontMotor.setSmartCurrentLimit(GrabberCalibrations.MOTOR_CURRENT_LIMIT);
     backMotor.setSmartCurrentLimit(GrabberCalibrations.MOTOR_CURRENT_LIMIT);
+  }
+
+  /**
+   * Burns the current settings to sparks so they keep current settings on reboot. Should be done
+   * after all settings are set.
+   */
+  public void burnFlashSparks() {
+    Timer.delay(0.005);
+    frontMotor.burnFlash();
+    backMotor.burnFlash();
   }
 
   @Override
