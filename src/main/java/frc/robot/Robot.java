@@ -4,10 +4,12 @@
 
 package frc.robot;
 
+import com.revrobotics.CANSparkMax.IdleMode;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.subsystems.drive.ModuleConstants;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -29,6 +31,7 @@ public class Robot extends TimedRobot {
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
+    m_robotContainer.initialize();
   }
 
   /**
@@ -49,7 +52,19 @@ public class Robot extends TimedRobot {
 
   /** This function is called once each time the robot enters Disabled mode. */
   @Override
-  public void disabledInit() {}
+  public void disabledInit() {
+    if (m_autonomousCommand != null) {
+      m_autonomousCommand.cancel();
+    }
+
+    CommandScheduler.getInstance().cancelAll();
+
+    m_robotContainer.arm.armMotor.setIdleMode(IdleMode.kCoast);
+    m_robotContainer.drive.frontLeft.turningSparkMax.setIdleMode(IdleMode.kCoast);
+    m_robotContainer.drive.frontRight.turningSparkMax.setIdleMode(IdleMode.kCoast);
+    m_robotContainer.drive.backLeft.turningSparkMax.setIdleMode(IdleMode.kCoast);
+    m_robotContainer.drive.backRight.turningSparkMax.setIdleMode(IdleMode.kCoast);
+  }
 
   @Override
   public void disabledPeriodic() {}
@@ -57,7 +72,7 @@ public class Robot extends TimedRobot {
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
   public void autonomousInit() {
-    // m_autonomousCommand = m_robotContainer.getAutonomousCommand();
+    m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
     // schedule the autonomous command (example)
     if (m_autonomousCommand != null) {
@@ -69,6 +84,16 @@ public class Robot extends TimedRobot {
     } else {
       m_robotContainer.timedMatch = false;
     }
+
+    m_robotContainer.arm.armMotor.setIdleMode(IdleMode.kBrake);
+    m_robotContainer.drive.frontLeft.turningSparkMax.setIdleMode(
+        ModuleConstants.TURNING_MOTOR_IDLE_MODE);
+    m_robotContainer.drive.frontRight.turningSparkMax.setIdleMode(
+        ModuleConstants.TURNING_MOTOR_IDLE_MODE);
+    m_robotContainer.drive.backLeft.turningSparkMax.setIdleMode(
+        ModuleConstants.TURNING_MOTOR_IDLE_MODE);
+    m_robotContainer.drive.backRight.turningSparkMax.setIdleMode(
+        ModuleConstants.TURNING_MOTOR_IDLE_MODE);
   }
 
   /** This function is called periodically during autonomous. */
@@ -85,11 +110,24 @@ public class Robot extends TimedRobot {
       m_autonomousCommand.cancel();
     }
 
+    // Never heading lock at start of teleop
+    m_robotContainer.drive.offsetCurrentHeading(0.0);
+
     if (DriverStation.getMatchTime() > 1.0) {
       m_robotContainer.timedMatch = true;
     } else {
       m_robotContainer.timedMatch = false;
     }
+
+    m_robotContainer.arm.armMotor.setIdleMode(IdleMode.kBrake);
+    m_robotContainer.drive.frontLeft.turningSparkMax.setIdleMode(
+        ModuleConstants.TURNING_MOTOR_IDLE_MODE);
+    m_robotContainer.drive.frontRight.turningSparkMax.setIdleMode(
+        ModuleConstants.TURNING_MOTOR_IDLE_MODE);
+    m_robotContainer.drive.backLeft.turningSparkMax.setIdleMode(
+        ModuleConstants.TURNING_MOTOR_IDLE_MODE);
+    m_robotContainer.drive.backRight.turningSparkMax.setIdleMode(
+        ModuleConstants.TURNING_MOTOR_IDLE_MODE);
   }
 
   /** This function is called periodically during operator control. */
