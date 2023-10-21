@@ -58,6 +58,9 @@ public class Arm extends SubsystemBase {
               ArmCal.ARM_MAX_ACCELERATION_DEG_PER_SECOND_SQUARED));
 
   public Arm(ScoringLocationUtil scoreLoc) {
+
+    SparkMaxUtils.initWithRetry(this::initSparks, Calibrations.SPARK_INIT_RETRY_ATTEMPTS);
+
     armPositionMap = new TreeMap<ArmPosition, Double>();
     armPositionMap.put(ArmPosition.STARTING, ArmCal.ARM_START_POSITION_DEG);
     armPositionMap.put(ArmPosition.INTAKE, ArmCal.ARM_INTAKE_POSITION_DEG);
@@ -233,11 +236,11 @@ public class Arm extends SubsystemBase {
         SparkMaxUtils.check(
             armMotor.setSoftLimit(SoftLimitDirection.kForward, ArmCal.ARM_POSITIVE_LIMIT_DEGREES));
 
+    errors += SparkMaxUtils.check(armMotor.setSoftLimit(SoftLimitDirection.kForward, ArmCal.ARM_POSITIVE_LIMIT_DEGREES));
+
     errors += SparkMaxUtils.check(armMotor.enableSoftLimit(SoftLimitDirection.kForward, true));
 
-    errors +=
-        SparkMaxUtils.check(
-            armMotor.setSoftLimit(SoftLimitDirection.kReverse, ArmCal.ARM_NEGATIVE_LIMIT_DEGREES));
+    errors += SparkMaxUtils.check(armMotor.setSoftLimit(SoftLimitDirection.kReverse, ArmCal.ARM_NEGATIVE_LIMIT_DEGREES));
 
     errors += SparkMaxUtils.check(armMotor.enableSoftLimit(SoftLimitDirection.kReverse, true));
 
