@@ -40,6 +40,7 @@ public class Grabber extends SubsystemBase {
   public void spinMotors(double power) {
     runningCommand = !(Math.abs(power) < 0.01);
     frontMotor.set(power);
+    backMotor.set(power);
   }
 
   public void intake() {

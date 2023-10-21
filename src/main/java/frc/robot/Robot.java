@@ -67,7 +67,13 @@ public class Robot extends TimedRobot {
   }
 
   @Override
-  public void disabledPeriodic() {}
+  public void disabledPeriodic() {
+    m_robotContainer.arm.armMotor.setIdleMode(IdleMode.kCoast);
+    m_robotContainer.drive.frontLeft.turningSparkMax.setIdleMode(IdleMode.kCoast);
+    m_robotContainer.drive.frontRight.turningSparkMax.setIdleMode(IdleMode.kCoast);
+    m_robotContainer.drive.backLeft.turningSparkMax.setIdleMode(IdleMode.kCoast);
+    m_robotContainer.drive.backRight.turningSparkMax.setIdleMode(IdleMode.kCoast);
+  }
 
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override

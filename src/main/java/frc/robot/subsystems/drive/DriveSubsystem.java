@@ -5,6 +5,7 @@
 package frc.robot.subsystems.drive;
 
 import com.ctre.phoenix.sensors.Pigeon2.AxisDirection;
+import com.fasterxml.jackson.databind.ser.impl.ReadOnlyClassToSerializerMap;
 import com.ctre.phoenix.sensors.WPI_Pigeon2;
 import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlanner;
@@ -124,6 +125,17 @@ public class DriveSubsystem extends SubsystemBase {
       backLeft.getPosition(),
       backRight.getPosition()
     };
+  }
+
+  public void initSparks() {
+    frontLeft.initDriveSpark();
+    frontRight.initDriveSpark();
+    backLeft.initDriveSpark();
+    backRight.initDriveSpark();
+    frontLeft.initTurnSpark();
+    frontRight.initTurnSpark();
+    backLeft.initTurnSpark();
+    backRight.initTurnSpark();
   }
 
   public void burnFlashSparks() {
@@ -579,6 +591,8 @@ public class DriveSubsystem extends SubsystemBase {
     builder.addDoubleProperty("Odometry Y (m)", () -> getPose().getY(), null);
     builder.addDoubleProperty(
         "Odometry Yaw (deg)", () -> getPose().getRotation().getDegrees(), null);
+    builder.addDoubleProperty(
+          "Front Left Rel Encoder", () -> {return frontLeft.turningSparkMax.getEncoder().getPosition();}, null);  
     builder.addDoubleProperty(
         "Front Left Abs Encoder (rad)", frontLeft::getTurningEncoderAbsPositionRad, null);
     builder.addDoubleProperty(

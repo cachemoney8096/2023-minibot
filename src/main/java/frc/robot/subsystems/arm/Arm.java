@@ -39,8 +39,7 @@ public class Arm extends SubsystemBase {
   public CANSparkMax armMotor =
       new CANSparkMax(RobotMap.ARM_PIVOT_MOTOR_CAN_ID, MotorType.kBrushless);
 
-  private final RelativeEncoder armEncoder = armMotor.getEncoder();
-  private final AbsoluteEncoder armAbsoluteEncoder = armMotor.getAbsoluteEncoder(Type.kDutyCycle);
+  private final AbsoluteEncoder armEncoder = armMotor.getAbsoluteEncoder(Type.kDutyCycle);
 
   public ScoringLocationUtil scoreLoc;
   private ArmPosition desiredPosition = ArmPosition.STARTING;
@@ -111,8 +110,8 @@ public class Arm extends SubsystemBase {
     double armDemandVoltsA = armController.calculate(getArmAngle());
     double armDemandVoltsB =
         ArmCal.ARM_FEEDFORWARD.calculate(
-            getArmAngleRelativeToHorizontal(), armController.getSetpoint().velocity);
-    armMotor.setVoltage(armDemandVoltsA + armDemandVoltsB);
+            getArmAngleRelativeToHorizontal() * (Math.PI / 180.0), armController.getSetpoint().velocity  * (Math.PI / 180.0));
+    // armMotor.setVoltage(armDemandVoltsA + armDemandVoltsB);
     SmartDashboard.putNumber("Arm PID", armDemandVoltsA);
     SmartDashboard.putNumber("Arm FF", armDemandVoltsB);
   }
@@ -160,7 +159,7 @@ public class Arm extends SubsystemBase {
   }
 
   public void zeroArmAtCurrentPos() {
-    ArmCal.armAbsoluteEncoderZeroPosDeg = armAbsoluteEncoder.getPosition();
+    ArmCal.armAbsoluteEncoderZeroPosDeg = armEncoder.getPosition();
     System.out.println("New Zero for Arm: " + ArmCal.armAbsoluteEncoderZeroPosDeg);
   }
 
@@ -170,11 +169,10 @@ public class Arm extends SubsystemBase {
   public int setDegreesFromGearRatioAbsoluteEncoder(AbsoluteEncoder sparkMaxEncoder, double ratio) {
     int errors = 0;
     double degreesPerRotation = 360.0 / ratio;
-    double degreesPerRotationPerSecond = degreesPerRotation / 60.0;
     errors += SparkMaxUtils.check(sparkMaxEncoder.setPositionConversionFactor(degreesPerRotation));
     errors +=
         SparkMaxUtils.check(
-            sparkMaxEncoder.setVelocityConversionFactor(degreesPerRotationPerSecond));
+            sparkMaxEncoder.setVelocityConversionFactor(degreesPerRotation));
     return errors;
   }
 
@@ -226,14 +224,10 @@ public class Arm extends SubsystemBase {
     errors += SparkMaxUtils.check(armMotor.restoreFactoryDefaults());
 
     // inverting stuff
-    errors += SparkMaxUtils.check(armAbsoluteEncoder.setInverted(true));
     errors += SparkMaxUtils.check(armEncoder.setInverted(true));
     armMotor.setInverted(false);
 
-    // Get positions and degrees of elevator through encoder in inches
-    errors += setDegreesFromGearRatioRelativeEncoder(armEncoder, ArmConstants.ARM_MOTOR_GEAR_RATIO);
-
-    errors += setDegreesFromGearRatioAbsoluteEncoder(armAbsoluteEncoder, 1.0);
+    errors += setDegreesFromGearRatioAbsoluteEncoder(armEncoder, 26.0/24.0);
 
     errors +=
         SparkMaxUtils.check(
@@ -269,11 +263,15 @@ public class Arm extends SubsystemBase {
     SendableHelper.addChild(builder, this, armController, "ArmController");
 
     builder.addDoubleProperty(
-        "Arm Abs Position (deg)", armAbsoluteEncoder::getPosition, armEncoder::setPosition);
-    builder.addBooleanProperty("Is cancelled", this::getCancelScore, this::setCancelScore);
-    builder.addDoubleProperty(
-        "Arm Position (deg)", armEncoder::getPosition, armEncoder::setPosition);
-    builder.addDoubleProperty("Arm Vel (deg/s)", armEncoder::getVelocity, null);
+        "Arm Abs Position (deg)", armEncoder::getPosition, null);
+    
+        builder.addDoubleProperty(
+          "Arm Angle (deg)", this::getArmAngle, null);
+      
+        builder.addBooleanProperty("Is cancelled", this::getCancelScore, this::setCancelScore);
+    // builder.addDoubleProperty(
+    //     "Arm Position (deg)", () -> {return armMotor.getEncoder().getPosition();}, null);
+    builder.addDoubleProperty("Arm Vel (deg per s)", armEncoder::getVelocity, null);
 
     builder.addDoubleProperty("Arm output", armMotor::get, null);
     builder.addStringProperty(

@@ -88,6 +88,10 @@ public class RobotContainer {
     drive.initialize();
     autonChooser.setDefaultOption("Nothing", new RunCommand(() -> {}, drive, arm));
 
+    drive.initSparks();
+    arm.initSparks();
+    grabber.initSparks();
+
     // Put the chooser on the dashboard
     SmartDashboard.putData(autonChooser);
 
@@ -148,23 +152,23 @@ public class RobotContainer {
                     })
                 .ignoringDisable(true));
 
-    driverController
-        .y()
-        .onTrue(
-            new InstantCommand(
-                    () -> {
-                      scoreLoc.setScoreHeight(ScoreHeight.MID);
-                    })
-                .ignoringDisable(true));
+    // driverController
+    //     .y()
+    //     .onTrue(
+    //         new InstantCommand(
+    //                 () -> {
+    //                   scoreLoc.setScoreHeight(ScoreHeight.MID);
+    //                 })
+    //             .ignoringDisable(true));
 
-    driverController
-        .b()
-        .onTrue(
-            new InstantCommand(
-                    () -> {
-                      scoreLoc.setScoreHeight(ScoreHeight.HIGH);
-                    })
-                .ignoringDisable(true));
+    // driverController
+    //     .b()
+    //     .onTrue(
+    //         new InstantCommand(
+    //                 () -> {
+    //                   scoreLoc.setScoreHeight(ScoreHeight.HIGH);
+    //                 })
+    //             .ignoringDisable(true));
 
     driverController.start().onTrue(new InstantCommand(lights::setPartyMode, lights));
 
@@ -187,12 +191,22 @@ public class RobotContainer {
     driverController.leftBumper().onTrue(new InstantCommand(arm::cancelScore, arm));
 
     driverController
+        .a()
+        .onTrue(
+            new InstantCommand(
+                () -> {
+                  arm.goToPosition(ArmPosition.STARTING);
+                }));
+    driverController
         .x()
         .onTrue(
             new InstantCommand(
                 () -> {
-                  arm.goToPosition(ArmPosition.INTAKE);
+                  arm.goToPosition(ArmPosition.SCORE_MID_HIGH);
                 }));
+    driverController.y().whileTrue(
+      new RunCommand(grabber::intake).finallyDo((boolean interrupted) -> {grabber.stopMotors();})
+    );
 
     driverController.rightTrigger().onTrue(new InstantCommand(arm::startScore, arm));
     driverController
