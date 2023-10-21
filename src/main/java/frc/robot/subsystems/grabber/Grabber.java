@@ -7,7 +7,9 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Calibrations;
 import frc.robot.RobotMap;
+import frc.robot.utils.SparkMaxUtils;
 import frc.robot.utils.ScoringLocationUtil.ScoreHeight;
 
 public class Grabber extends SubsystemBase {
@@ -29,6 +31,7 @@ public class Grabber extends SubsystemBase {
 
   public Grabber(Command rumbleBrieflyCmd) {
     this.rumbleBriefly = rumbleBrieflyCmd;
+    SparkMaxUtils.initWithRetry(this::initSparks, Calibrations.SPARK_INIT_RETRY_ATTEMPTS);
   }
 
   public void spinMotors(double power) {
@@ -71,12 +74,16 @@ public class Grabber extends SubsystemBase {
     return seeGamePieceNow;
   }
 
-  public void initSparks() {
-    frontMotor.restoreFactoryDefaults();
-    backMotor.restoreFactoryDefaults();
-    backMotor.follow(frontMotor);
-    frontMotor.setSmartCurrentLimit(GrabberCalibrations.MOTOR_CURRENT_LIMIT);
-    backMotor.setSmartCurrentLimit(GrabberCalibrations.MOTOR_CURRENT_LIMIT);
+  public boolean initSparks() {
+    int errors = 0;
+    errors += SparkMaxUtils.check(frontMotor.restoreFactoryDefaults());
+    errors += SparkMaxUtils.check(backMotor.restoreFactoryDefaults());
+    // backMotor.follow(frontMotor);
+
+    errors += SparkMaxUtils.check(frontMotor.setSmartCurrentLimit(GrabberCalibrations.MOTOR_CURRENT_LIMIT));
+    errors += SparkMaxUtils.check(backMotor.setSmartCurrentLimit(GrabberCalibrations.MOTOR_CURRENT_LIMIT));
+
+    return errors == 0;
   }
 
   /**

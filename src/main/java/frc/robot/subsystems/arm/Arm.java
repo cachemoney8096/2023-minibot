@@ -18,10 +18,13 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Calibrations;
 import frc.robot.RobotMap;
 import frc.robot.utils.ScoringLocationUtil;
 import frc.robot.utils.ScoringLocationUtil.ScoreHeight;
 import frc.robot.utils.SendableHelper;
+import frc.robot.utils.SparkMaxUtils;
+
 import java.util.TreeMap;
 
 public class Arm extends SubsystemBase {
@@ -57,7 +60,7 @@ public class Arm extends SubsystemBase {
               ArmCal.ARM_MAX_ACCELERATION_DEG_PER_SECOND_SQUARED));
 
   public Arm(ScoringLocationUtil scoreLoc) {
-
+    SparkMaxUtils.initWithRetry(this::initSparks, Calibrations.SPARK_INIT_RETRY_ATTEMPTS);
     armPositionMap = new TreeMap<ArmPosition, Double>();
     armPositionMap.put(ArmPosition.STARTING, ArmCal.ARM_START_POSITION_DEG);
     armPositionMap.put(ArmPosition.INTAKE, ArmCal.ARM_INTAKE_POSITION_DEG);
@@ -203,12 +206,13 @@ public class Arm extends SubsystemBase {
   }
 
   /** Does all the initialization for the sparks */
-  public void initSparks() {
-
-    armMotor.restoreFactoryDefaults();
+  public boolean initSparks() {
+    int errors = 0;
+    errors += SparkMaxUtils.check(armMotor.restoreFactoryDefaults());
 
     // inverting stuff
     armAbsoluteEncoder.setInverted(true);
+    errors += SparkMaxUtils.check(armEncoder.setInverted(true));
     armMotor.setInverted(false);
 
     // Get positions and degrees of elevator through encoder in inches
@@ -216,17 +220,19 @@ public class Arm extends SubsystemBase {
 
     setDegreesFromGearRatioAbsoluteEncoder(armAbsoluteEncoder, 1.0);
 
-    armMotor.setSoftLimit(SoftLimitDirection.kForward, ArmCal.ARM_POSITIVE_LIMIT_DEGREES);
+    errors += SparkMaxUtils.check(armMotor.setSoftLimit(SoftLimitDirection.kForward, ArmCal.ARM_POSITIVE_LIMIT_DEGREES));
 
-    armMotor.enableSoftLimit(SoftLimitDirection.kForward, true);
+    errors += SparkMaxUtils.check(armMotor.enableSoftLimit(SoftLimitDirection.kForward, true));
 
-    armMotor.setSoftLimit(SoftLimitDirection.kReverse, ArmCal.ARM_NEGATIVE_LIMIT_DEGREES);
+    errors += SparkMaxUtils.check(armMotor.setSoftLimit(SoftLimitDirection.kReverse, ArmCal.ARM_NEGATIVE_LIMIT_DEGREES));
 
-    armMotor.enableSoftLimit(SoftLimitDirection.kReverse, true);
+    errors += SparkMaxUtils.check(armMotor.enableSoftLimit(SoftLimitDirection.kReverse, true));
 
-    armMotor.setIdleMode(IdleMode.kBrake);
+    errors += SparkMaxUtils.check(armMotor.setIdleMode(IdleMode.kBrake));
 
-    armMotor.setSmartCurrentLimit(ArmCal.ARM_CURRENT_LIMIT_AMPS);
+    errors += SparkMaxUtils.check(armMotor.setSmartCurrentLimit(ArmCal.ARM_CURRENT_LIMIT_AMPS));
+
+    return errors == 0;
   }
 
   /**

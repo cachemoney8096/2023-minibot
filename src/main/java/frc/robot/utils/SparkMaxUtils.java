@@ -1,9 +1,19 @@
 package frc.robot.utils;
 
 import com.revrobotics.AbsoluteEncoder;
+import com.revrobotics.REVLibError;
+
 import java.util.function.BooleanSupplier;
 
 public class SparkMaxUtils {
+
+  /**
+   * @param error API return value
+   * @return
+   */
+  public static int check(REVLibError error) {
+    return error == REVLibError.kOk ? 0 : 1;
+  }
 
   public static class UnitConversions {
     public static void setRadsFromGearRatio(AbsoluteEncoder sparkMaxEncoder, double ratio) {

@@ -16,6 +16,7 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.Timer;
+import frc.robot.Calibrations;
 import frc.robot.utils.AbsoluteEncoderChecker;
 import frc.robot.utils.SparkMaxUtils;
 
@@ -44,6 +45,8 @@ public class SwerveModule implements Sendable {
     drivingSparkMax = new CANSparkMax(drivingCanId, MotorType.kBrushless);
     turningSparkMax = new CANSparkMax(turningCanId, MotorType.kBrushless);
     chassisAngularOffsetRadians = chassisAngularOffset;
+
+    SparkMaxUtils.initWithRetry(this::initDriveSpark, Calibrations.SPARK_INIT_RETRY_ATTEMPTS);
 
     drivingEncoder = drivingSparkMax.getEncoder();
     drivingPIDController = drivingSparkMax.getPIDController();
@@ -85,27 +88,45 @@ public class SwerveModule implements Sendable {
   }
 
   /** Does all the initialization for the spark */
-  void initDriveSpark() {
+  boolean initDriveSpark() {
+    int errors = 0;
     drivingSparkMax.restoreFactoryDefaults();
 
     drivingSparkMax.setInverted(ModuleConstants.DRIVING_SPARK_MAX_INVERTED);
 
     RelativeEncoder drivingEncoderTmp = drivingSparkMax.getEncoder();
     SparkMaxPIDController drivingPidTmp = drivingSparkMax.getPIDController();
-    drivingPidTmp.setFeedbackDevice(drivingEncoderTmp);
+    errors += SparkMaxUtils.check(drivingPidTmp.setFeedbackDevice(drivingEncoderTmp));
 
-    drivingPidTmp.setP(ModuleCal.DRIVING_P);
-    drivingPidTmp.setI(ModuleCal.DRIVING_I);
-    drivingPidTmp.setD(ModuleCal.DRIVING_D);
-    drivingPidTmp.setFF(ModuleCal.DRIVING_FF);
+    errors += SparkMaxUtils.check(drivingPidTmp.setP(ModuleCal.DRIVING_P));
+    errors += SparkMaxUtils.check(drivingPidTmp.setI(ModuleCal.DRIVING_I));
+    errors += SparkMaxUtils.check(drivingPidTmp.setD(ModuleCal.DRIVING_D));
+    errors += SparkMaxUtils.check(drivingPidTmp.setFF(ModuleCal.DRIVING_FF));
+
     drivingPidTmp.setOutputRange(ModuleCal.DRIVING_MIN_OUPTUT, ModuleCal.DRIVING_MAX_OUTPUT);
-    drivingEncoderTmp.setPositionConversionFactor(
-        ModuleConstants.DRIVING_ENCODER_POSITION_FACTOR_METERS);
-    drivingEncoderTmp.setVelocityConversionFactor(
-        ModuleConstants.DRIVING_ENCODER_VELOCITY_FACTOR_METERS_PER_SECOND);
 
-    drivingSparkMax.setIdleMode(ModuleConstants.DRIVING_MOTOR_IDLE_MODE);
-    drivingSparkMax.setSmartCurrentLimit(ModuleConstants.DRIVING_MOTOR_CURRENT_LIMIT_AMPS);
+    errors +=
+        SparkMaxUtils.check(
+            drivingPidTmp.setOutputRange(
+                ModuleCal.DRIVING_MIN_OUPTUT, ModuleCal.DRIVING_MAX_OUTPUT));
+
+    errors +=
+        SparkMaxUtils.check(
+            drivingEncoderTmp.setPositionConversionFactor(
+                ModuleConstants.DRIVING_ENCODER_POSITION_FACTOR_METERS));
+
+    errors +=
+        SparkMaxUtils.check(
+            drivingEncoderTmp.setVelocityConversionFactor(
+                ModuleConstants.DRIVING_ENCODER_VELOCITY_FACTOR_METERS_PER_SECOND));
+
+    errors +=
+        SparkMaxUtils.check(drivingSparkMax.setIdleMode(ModuleConstants.DRIVING_MOTOR_IDLE_MODE));
+    errors +=
+        SparkMaxUtils.check(
+            drivingSparkMax.setSmartCurrentLimit(ModuleConstants.DRIVING_MOTOR_CURRENT_LIMIT_AMPS));
+
+    return errors == 0;
   }
 
   /**
