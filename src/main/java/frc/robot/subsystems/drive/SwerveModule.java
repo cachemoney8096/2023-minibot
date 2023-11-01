@@ -103,12 +103,12 @@ public class SwerveModule implements Sendable {
     errors += SparkMaxUtils.check(drivingPidTmp.setD(ModuleCal.DRIVING_D));
     errors += SparkMaxUtils.check(drivingPidTmp.setFF(ModuleCal.DRIVING_FF));
 
-    drivingPidTmp.setOutputRange(ModuleCal.DRIVING_MIN_OUPTUT, ModuleCal.DRIVING_MAX_OUTPUT);
+    drivingPidTmp.setOutputRange(ModuleCal.DRIVING_MIN_OUTPUT, ModuleCal.DRIVING_MAX_OUTPUT);
 
     errors +=
         SparkMaxUtils.check(
             drivingPidTmp.setOutputRange(
-                ModuleCal.DRIVING_MIN_OUPTUT, ModuleCal.DRIVING_MAX_OUTPUT));
+                ModuleCal.DRIVING_MIN_OUTPUT, ModuleCal.DRIVING_MAX_OUTPUT));
 
     errors +=
         SparkMaxUtils.check(
