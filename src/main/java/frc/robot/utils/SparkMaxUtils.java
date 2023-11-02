@@ -24,14 +24,6 @@ public class SparkMaxUtils {
     }
   }
 
-  /**
-   * @param error API return value
-   * @return
-   */
-  public static int check(REVLibError error) {
-    return error == REVLibError.kOk ? 0 : 1;
-  }
-
   public static void initWithRetry(BooleanSupplier initFunction, int maxRetryAttempts) {
     int numAttempts = 0;
     while (!initFunction.getAsBoolean()) {
