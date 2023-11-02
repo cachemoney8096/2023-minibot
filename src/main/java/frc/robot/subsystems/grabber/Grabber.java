@@ -9,8 +9,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Calibrations;
 import frc.robot.RobotMap;
-import frc.robot.utils.SparkMaxUtils;
 import frc.robot.utils.ScoringLocationUtil.ScoreHeight;
+import frc.robot.utils.SparkMaxUtils;
 
 public class Grabber extends SubsystemBase {
 
@@ -82,8 +82,12 @@ public class Grabber extends SubsystemBase {
     errors += SparkMaxUtils.check(frontMotor.restoreFactoryDefaults());
     errors += SparkMaxUtils.check(backMotor.restoreFactoryDefaults());
 
-    errors += SparkMaxUtils.check(frontMotor.setSmartCurrentLimit(GrabberCalibrations.MOTOR_CURRENT_LIMIT));
-    errors += SparkMaxUtils.check(backMotor.setSmartCurrentLimit(GrabberCalibrations.MOTOR_CURRENT_LIMIT));
+    errors +=
+        SparkMaxUtils.check(
+            frontMotor.setSmartCurrentLimit(GrabberCalibrations.MOTOR_CURRENT_LIMIT));
+    errors +=
+        SparkMaxUtils.check(
+            backMotor.setSmartCurrentLimit(GrabberCalibrations.MOTOR_CURRENT_LIMIT));
 
     return errors == 0;
   }

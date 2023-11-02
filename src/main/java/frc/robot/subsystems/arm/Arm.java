@@ -24,7 +24,6 @@ import frc.robot.utils.ScoringLocationUtil;
 import frc.robot.utils.ScoringLocationUtil.ScoreHeight;
 import frc.robot.utils.SendableHelper;
 import frc.robot.utils.SparkMaxUtils;
-
 import java.util.TreeMap;
 
 public class Arm extends SubsystemBase {
@@ -168,27 +167,30 @@ public class Arm extends SubsystemBase {
   /**
    * @return the number of errors made when setting up the sparks
    */
-  public int setDegreesFromGearRatioAbsoluteEncoder(
-      AbsoluteEncoder sparkMaxEncoder, double ratio) {
+  public int setDegreesFromGearRatioAbsoluteEncoder(AbsoluteEncoder sparkMaxEncoder, double ratio) {
     int errors = 0;
     double degreesPerRotation = 360.0 / ratio;
     double degreesPerRotationPerSecond = degreesPerRotation / 60.0;
     errors += SparkMaxUtils.check(sparkMaxEncoder.setPositionConversionFactor(degreesPerRotation));
-    errors += SparkMaxUtils.check(sparkMaxEncoder.setVelocityConversionFactor(degreesPerRotationPerSecond));
+    errors +=
+        SparkMaxUtils.check(
+            sparkMaxEncoder.setVelocityConversionFactor(degreesPerRotationPerSecond));
     return errors;
   }
-  
+
   /**
    * @return the number of errors made when setting up the sparks
    */
   public static int setDegreesFromGearRatioRelativeEncoder(
-    RelativeEncoder sparkMaxEncoder, double ratio) {
+      RelativeEncoder sparkMaxEncoder, double ratio) {
 
     int errors = 0;
     double degreesPerRotation = 360.0 / ratio;
     double degreesPerRotationPerSecond = degreesPerRotation / 60.0;
     errors += SparkMaxUtils.check(sparkMaxEncoder.setPositionConversionFactor(degreesPerRotation));
-    errors += SparkMaxUtils.check(sparkMaxEncoder.setVelocityConversionFactor(degreesPerRotationPerSecond));
+    errors +=
+        SparkMaxUtils.check(
+            sparkMaxEncoder.setVelocityConversionFactor(degreesPerRotationPerSecond));
 
     return errors;
   }
@@ -233,11 +235,15 @@ public class Arm extends SubsystemBase {
 
     errors += setDegreesFromGearRatioAbsoluteEncoder(armAbsoluteEncoder, 1.0);
 
-    errors += SparkMaxUtils.check(armMotor.setSoftLimit(SoftLimitDirection.kForward, ArmCal.ARM_POSITIVE_LIMIT_DEGREES));
+    errors +=
+        SparkMaxUtils.check(
+            armMotor.setSoftLimit(SoftLimitDirection.kForward, ArmCal.ARM_POSITIVE_LIMIT_DEGREES));
 
     errors += SparkMaxUtils.check(armMotor.enableSoftLimit(SoftLimitDirection.kForward, true));
 
-    errors += SparkMaxUtils.check(armMotor.setSoftLimit(SoftLimitDirection.kReverse, ArmCal.ARM_NEGATIVE_LIMIT_DEGREES));
+    errors +=
+        SparkMaxUtils.check(
+            armMotor.setSoftLimit(SoftLimitDirection.kReverse, ArmCal.ARM_NEGATIVE_LIMIT_DEGREES));
 
     errors += SparkMaxUtils.check(armMotor.enableSoftLimit(SoftLimitDirection.kReverse, true));
 

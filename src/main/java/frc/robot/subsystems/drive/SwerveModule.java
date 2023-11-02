@@ -82,16 +82,28 @@ public class SwerveModule implements Sendable {
     / gear ratio)*/
     SparkMaxUtils.UnitConversions.setRadsFromGearRatio(
         turningEncoderTmp, ModuleConstants.TURNING_ENCODER_GEAR_RATIO);
-    errors += SparkMaxUtils.check(turningEncoderTmp.setInverted(ModuleConstants.TURNING_ENCODER_INVERTED));
+    errors +=
+        SparkMaxUtils.check(
+            turningEncoderTmp.setInverted(ModuleConstants.TURNING_ENCODER_INVERTED));
     errors += SparkMaxUtils.check(turningPidTmp.setPositionPIDWrappingEnabled(true));
-    errors += SparkMaxUtils.check(turningPidTmp.setPositionPIDWrappingMinInput(
-        ModuleConstants.TURNING_ENCODER_POSITION_PID_MIN_INPUT_RADIANS));
-    errors += SparkMaxUtils.check(turningPidTmp.setPositionPIDWrappingMaxInput(
-        ModuleConstants.TURNING_ENCODER_POSITION_PID_MAX_INPUT_RADIANS));
+    errors +=
+        SparkMaxUtils.check(
+            turningPidTmp.setPositionPIDWrappingMinInput(
+                ModuleConstants.TURNING_ENCODER_POSITION_PID_MIN_INPUT_RADIANS));
+    errors +=
+        SparkMaxUtils.check(
+            turningPidTmp.setPositionPIDWrappingMaxInput(
+                ModuleConstants.TURNING_ENCODER_POSITION_PID_MAX_INPUT_RADIANS));
 
-    errors += SparkMaxUtils.check(turningPidTmp.setOutputRange(ModuleCal.TURNING_MIN_OUTPUT, ModuleCal.TURNING_MAX_OUTPUT));
-    errors += SparkMaxUtils.check(turningSparkMax.setIdleMode(ModuleConstants.TURNING_MOTOR_IDLE_MODE));
-    errors += SparkMaxUtils.check(turningSparkMax.setSmartCurrentLimit(ModuleConstants.TURNING_MOTOR_CURRENT_LIMIT_AMPS));
+    errors +=
+        SparkMaxUtils.check(
+            turningPidTmp.setOutputRange(
+                ModuleCal.TURNING_MIN_OUTPUT, ModuleCal.TURNING_MAX_OUTPUT));
+    errors +=
+        SparkMaxUtils.check(turningSparkMax.setIdleMode(ModuleConstants.TURNING_MOTOR_IDLE_MODE));
+    errors +=
+        SparkMaxUtils.check(
+            turningSparkMax.setSmartCurrentLimit(ModuleConstants.TURNING_MOTOR_CURRENT_LIMIT_AMPS));
 
     return errors == 0;
   }
@@ -112,7 +124,10 @@ public class SwerveModule implements Sendable {
     errors += SparkMaxUtils.check(drivingPidTmp.setD(ModuleCal.DRIVING_D));
     errors += SparkMaxUtils.check(drivingPidTmp.setFF(ModuleCal.DRIVING_FF));
 
-    errors += SparkMaxUtils.check(drivingPidTmp.setOutputRange(ModuleCal.DRIVING_MIN_OUTPUT, ModuleCal.DRIVING_MAX_OUTPUT));
+    errors +=
+        SparkMaxUtils.check(
+            drivingPidTmp.setOutputRange(
+                ModuleCal.DRIVING_MIN_OUTPUT, ModuleCal.DRIVING_MAX_OUTPUT));
 
     errors +=
         SparkMaxUtils.check(

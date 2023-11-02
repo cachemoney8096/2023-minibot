@@ -2,7 +2,6 @@ package frc.robot.utils;
 
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.REVLibError;
-
 import java.util.function.BooleanSupplier;
 
 public class SparkMaxUtils {
