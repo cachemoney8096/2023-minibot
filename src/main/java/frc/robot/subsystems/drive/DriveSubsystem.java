@@ -94,6 +94,13 @@ public class DriveSubsystem extends SubsystemBase {
     isTimedMatch = isTimedMatchFunc;
   }
 
+  public void initialize() {
+    frontLeft.initialize();
+    frontRight.initialize();
+    backLeft.initialize();
+    backRight.initialize();
+  }
+
   public double getFilteredPitch() {
     return latestFilteredPitchDeg - DriveCal.IMU_PITCH_BIAS_DEG;
   }

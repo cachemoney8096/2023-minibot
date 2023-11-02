@@ -27,7 +27,7 @@ public class RobotMap {
   public static final int PIGEON_CAN_ID = Constants.PLACEHOLDER_INT;
 
   /** Channel for the game piece sensor */
-  public static final int GRABBER_GAME_PIECE_SENSOR_DIO = Constants.PLACEHOLDER_INT;
+  public static final int GRABBER_GAME_PIECE_SENSOR_DIO = 0;
 
   public static final int DRIVER_CONTROLLER_PORT = 0, OPERATOR_CONTROLLER_PORT = 1;
 }
