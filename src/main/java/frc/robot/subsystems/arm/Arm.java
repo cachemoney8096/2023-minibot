@@ -165,6 +165,9 @@ public class Arm extends SubsystemBase {
     System.out.println("New Zero for Arm: " + ArmCal.armAbsoluteEncoderZeroPosDeg);
   }
 
+  /**
+   * @return the number of errors made when setting up the sparks
+   */
   public int setDegreesFromGearRatioAbsoluteEncoder(
       AbsoluteEncoder sparkMaxEncoder, double ratio) {
     int errors = 0;
@@ -174,7 +177,10 @@ public class Arm extends SubsystemBase {
     errors += SparkMaxUtils.check(sparkMaxEncoder.setVelocityConversionFactor(degreesPerRotationPerSecond));
     return errors;
   }
-
+  
+  /**
+   * @return the number of errors made when setting up the sparks
+   */
   public static int setDegreesFromGearRatioRelativeEncoder(
     RelativeEncoder sparkMaxEncoder, double ratio) {
 
