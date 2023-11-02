@@ -60,7 +60,6 @@ public class Arm extends SubsystemBase {
               ArmCal.ARM_MAX_ACCELERATION_DEG_PER_SECOND_SQUARED));
 
   public Arm(ScoringLocationUtil scoreLoc) {
-    this.initialize();
     armPositionMap = new TreeMap<ArmPosition, Double>();
     armPositionMap.put(ArmPosition.STARTING, ArmCal.ARM_START_POSITION_DEG);
     armPositionMap.put(ArmPosition.INTAKE, ArmCal.ARM_INTAKE_POSITION_DEG);
@@ -166,20 +165,26 @@ public class Arm extends SubsystemBase {
     System.out.println("New Zero for Arm: " + ArmCal.armAbsoluteEncoderZeroPosDeg);
   }
 
-  public void setDegreesFromGearRatioAbsoluteEncoder(
+  public int setDegreesFromGearRatioAbsoluteEncoder(
       AbsoluteEncoder sparkMaxEncoder, double ratio) {
+    int errors = 0;
     double degreesPerRotation = 360.0 / ratio;
     double degreesPerRotationPerSecond = degreesPerRotation / 60.0;
-    sparkMaxEncoder.setPositionConversionFactor(degreesPerRotation);
-    sparkMaxEncoder.setVelocityConversionFactor(degreesPerRotationPerSecond);
+    errors += SparkMaxUtils.check(sparkMaxEncoder.setPositionConversionFactor(degreesPerRotation));
+    errors += SparkMaxUtils.check(sparkMaxEncoder.setVelocityConversionFactor(degreesPerRotationPerSecond));
+    return errors;
   }
 
-  public static void setDegreesFromGearRatioRelativeEncoder(
-      RelativeEncoder sparkMaxEncoder, double ratio) {
+  public static int setDegreesFromGearRatioRelativeEncoder(
+    RelativeEncoder sparkMaxEncoder, double ratio) {
+
+    int errors = 0;
     double degreesPerRotation = 360.0 / ratio;
     double degreesPerRotationPerSecond = degreesPerRotation / 60.0;
-    sparkMaxEncoder.setPositionConversionFactor(degreesPerRotation);
-    sparkMaxEncoder.setVelocityConversionFactor(degreesPerRotationPerSecond);
+    errors += SparkMaxUtils.check(sparkMaxEncoder.setPositionConversionFactor(degreesPerRotation));
+    errors += SparkMaxUtils.check(sparkMaxEncoder.setVelocityConversionFactor(degreesPerRotationPerSecond));
+
+    return errors;
   }
 
   /** True if the arm is at the queried position. */
@@ -213,14 +218,14 @@ public class Arm extends SubsystemBase {
     errors += SparkMaxUtils.check(armMotor.restoreFactoryDefaults());
 
     // inverting stuff
-    armAbsoluteEncoder.setInverted(true);
+    errors += SparkMaxUtils.check(armAbsoluteEncoder.setInverted(true));
     errors += SparkMaxUtils.check(armEncoder.setInverted(true));
     armMotor.setInverted(false);
 
     // Get positions and degrees of elevator through encoder in inches
-    setDegreesFromGearRatioRelativeEncoder(armEncoder, ArmConstants.ARM_MOTOR_GEAR_RATIO);
+    errors += setDegreesFromGearRatioRelativeEncoder(armEncoder, ArmConstants.ARM_MOTOR_GEAR_RATIO);
 
-    setDegreesFromGearRatioAbsoluteEncoder(armAbsoluteEncoder, 1.0);
+    errors += setDegreesFromGearRatioAbsoluteEncoder(armAbsoluteEncoder, 1.0);
 
     errors += SparkMaxUtils.check(armMotor.setSoftLimit(SoftLimitDirection.kForward, ArmCal.ARM_POSITIVE_LIMIT_DEGREES));
 

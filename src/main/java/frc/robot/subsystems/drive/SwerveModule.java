@@ -46,8 +46,6 @@ public class SwerveModule implements Sendable {
     turningSparkMax = new CANSparkMax(turningCanId, MotorType.kBrushless);
     chassisAngularOffsetRadians = chassisAngularOffset;
 
-    this.initialize();
-
     drivingEncoder = drivingSparkMax.getEncoder();
     drivingPIDController = drivingSparkMax.getPIDController();
     turningEncoder = turningSparkMax.getAbsoluteEncoder(Type.kDutyCycle);
@@ -66,7 +64,7 @@ public class SwerveModule implements Sendable {
   boolean initTurnSpark() {
     int errors = 0;
 
-    turningSparkMax.restoreFactoryDefaults();
+    errors += SparkMaxUtils.check(turningSparkMax.restoreFactoryDefaults());
 
     turningSparkMax.setInverted(ModuleConstants.TURNING_SPARK_MAX_INVERTED);
 
@@ -101,7 +99,7 @@ public class SwerveModule implements Sendable {
   /** Does all the initialization for the spark */
   boolean initDriveSpark() {
     int errors = 0;
-    drivingSparkMax.restoreFactoryDefaults();
+    errors += SparkMaxUtils.check(drivingSparkMax.restoreFactoryDefaults());
 
     drivingSparkMax.setInverted(ModuleConstants.DRIVING_SPARK_MAX_INVERTED);
 
@@ -114,7 +112,7 @@ public class SwerveModule implements Sendable {
     errors += SparkMaxUtils.check(drivingPidTmp.setD(ModuleCal.DRIVING_D));
     errors += SparkMaxUtils.check(drivingPidTmp.setFF(ModuleCal.DRIVING_FF));
 
-    drivingPidTmp.setOutputRange(ModuleCal.DRIVING_MIN_OUTPUT, ModuleCal.DRIVING_MAX_OUTPUT);
+    errors += SparkMaxUtils.check(drivingPidTmp.setOutputRange(ModuleCal.DRIVING_MIN_OUTPUT, ModuleCal.DRIVING_MAX_OUTPUT));
 
     errors +=
         SparkMaxUtils.check(

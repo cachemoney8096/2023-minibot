@@ -83,6 +83,9 @@ public class RobotContainer {
   }
 
   public void initialize() {
+    arm.initialize();
+    grabber.initialize();
+    drive.initialize();
     autonChooser.setDefaultOption("Nothing", new RunCommand(() -> {}, drive, arm));
 
     // Put the chooser on the dashboard

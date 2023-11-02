@@ -82,7 +82,6 @@ public class Grabber extends SubsystemBase {
     int errors = 0;
     errors += SparkMaxUtils.check(frontMotor.restoreFactoryDefaults());
     errors += SparkMaxUtils.check(backMotor.restoreFactoryDefaults());
-    // backMotor.follow(frontMotor);
 
     errors += SparkMaxUtils.check(frontMotor.setSmartCurrentLimit(GrabberCalibrations.MOTOR_CURRENT_LIMIT));
     errors += SparkMaxUtils.check(backMotor.setSmartCurrentLimit(GrabberCalibrations.MOTOR_CURRENT_LIMIT));
