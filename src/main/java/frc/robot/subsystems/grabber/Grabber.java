@@ -31,6 +31,10 @@ public class Grabber extends SubsystemBase {
 
   public Grabber(Command rumbleBrieflyCmd) {
     this.rumbleBriefly = rumbleBrieflyCmd;
+    this.initialize();
+  }
+
+  public void initialize() {
     SparkMaxUtils.initWithRetry(this::initSparks, Calibrations.SPARK_INIT_RETRY_ATTEMPTS);
   }
 

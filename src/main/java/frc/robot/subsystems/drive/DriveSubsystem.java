@@ -87,11 +87,19 @@ public class DriveSubsystem extends SubsystemBase {
 
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem(Lights lightsSubsystem, BooleanSupplier isTimedMatchFunc) {
+    this.initialize();
     gyro.configFactoryDefault();
     gyro.reset();
     gyro.configMountPose(AxisDirection.PositiveY, AxisDirection.PositiveZ);
     lights = lightsSubsystem;
     isTimedMatch = isTimedMatchFunc;
+  }
+
+  public void initialize() {
+    frontLeft.initialize();
+    frontRight.initialize();
+    backLeft.initialize();
+    backRight.initialize();
   }
 
   public double getFilteredPitch() {
