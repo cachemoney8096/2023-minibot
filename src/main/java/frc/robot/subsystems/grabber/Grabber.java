@@ -31,7 +31,6 @@ public class Grabber extends SubsystemBase {
 
   public Grabber(Command rumbleBrieflyCmd) {
     this.rumbleBriefly = rumbleBrieflyCmd;
-    this.initialize();
   }
 
   public void initialize() {
