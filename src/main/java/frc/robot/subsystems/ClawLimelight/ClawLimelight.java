@@ -43,14 +43,14 @@ public class ClawLimelight extends SubsystemBase {
   private double m_lastX = 0.0;
   private double m_lastY = 0.0;
 
-  NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight-cone");
+  NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight-cube");
   NetworkTableEntry tx = table.getEntry("tx");
   NetworkTableEntry ty = table.getEntry("ty");
   NetworkTableEntry ta = table.getEntry("ta");
   NetworkTableEntry tclass = table.getEntry("tclass");
 
   /**
-   * Create an IntakeLimelight object
+   * Create an ClawLimelight object
    *
    * @param angleDegrees angle from normal in degress. Looking straight out is 0, and increasing as
    *     the camera is tilted towards the ceiling.
@@ -64,7 +64,7 @@ public class ClawLimelight extends SubsystemBase {
     kTargetClass = targetClass;
     setLimelightValues(ledMode.OFF, camMode.VISION_PROCESSING, pipeline.PIPELINE3);
 
-    m_simDevice = SimDevice.create("limelight-cone");
+    m_simDevice = SimDevice.create("limelight-cube");
     if (m_simDevice != null) {
       m_targetArea = m_simDevice.createDouble("Target Area", Direction.kBidir, 0.0);
       m_skew = m_simDevice.createDouble("Skew", Direction.kBidir, 0.0);
@@ -227,22 +227,14 @@ public class ClawLimelight extends SubsystemBase {
    * @return true is limelight has made a target else false
    */
   public boolean isValidTarget() {
-    if (getValidTarget() > 0) {
-      return true;
-    } else {
-      return false;
-    }
+    return getValidTarget() > 0;
   }
 
   /**
    * @return true as long as limelight does not have value of -1
    */
   public boolean CheckConnection() { // ??? this depends on return of null, -1?
-    if (getValidTarget() == -1.0) {
-      return false;
-    } else {
-      return true;
-    }
+    return getValidTarget() != -1.0;
   }
 
   /**
@@ -385,7 +377,7 @@ public class ClawLimelight extends SubsystemBase {
     return Optional.of(maxY - minY);
   }
 
-  public class ConeDetection {
+  public class CubeDetection {
     public double latencySec;
     /** Distance from camera */
     public double distanceMeters;
@@ -393,7 +385,7 @@ public class ClawLimelight extends SubsystemBase {
     /** CCW Angle */
     public double angleDeg;
 
-    public ConeDetection(double latencySec, double distanceMeters, double angleDeg) {
+    public CubeDetection(double latencySec, double distanceMeters, double angleDeg) {
       this.latencySec = latencySec;
       this.distanceMeters = distanceMeters;
       this.angleDeg = angleDeg;
@@ -401,22 +393,22 @@ public class ClawLimelight extends SubsystemBase {
   }
 
   /**
-   * Looks for a cone
+   * Looks for a cube
    *
-   * @return If empty, no cone detected. First value is cone yaw in degrees (ccw), second value is
+   * @return If empty, no cube detected. First value is cube yaw in degrees (ccw), second value is
    *     distance in meters.
    */
-  public Optional<ConeDetection> getConePos() {
+  public Optional<CubeDetection> getConePos() {
     double[] corners = table.getEntry("tcornxy").getDoubleArray(new double[0]);
     Optional<Double> maybeXPixels = getXOfSmallestY(corners);
     Optional<Double> maybeYHeightPixels = getObjectHeightPx(corners);
 
     if (!maybeXPixels.isPresent() || !maybeYHeightPixels.isPresent()) {
-      System.out.println("Didn't see cone");
+      System.out.println("Didn't see cube");
       return Optional.empty();
     }
 
-    // Compute cone distance
+    // Compute cube distance
     // kinda based on the same thing as below:
     // https://docs.limelightvision.io/en/latest/theory.html#from-pixels-to-angles
     final double vertFovDeg = 49.7;
@@ -428,7 +420,7 @@ public class ClawLimelight extends SubsystemBase {
     final double CONE_HEIGHT_METERS = Units.inchesToMeters(13.0);
     double coneDistanceMeters = CONE_HEIGHT_METERS / viewplaneYPixels;
 
-    // Compute cone angle based on
+    // Compute cube angle based on
     // https://docs.limelightvision.io/en/latest/theory.html#from-pixels-to-angles
     double xPixels = maybeXPixels.get();
     double halfResXPixels = RESOLUTION_X / 2.0;
@@ -439,7 +431,7 @@ public class ClawLimelight extends SubsystemBase {
     double angleXDegrees = Units.radiansToDegrees(Math.atan2(viewplaneXPixels, 1));
     double angleAdjustDegrees = -3.0; // due to limelight yaw
     double adjustedAngleDegrees = angleXDegrees + angleAdjustDegrees;
-    return Optional.of(new ConeDetection(getLatency(), coneDistanceMeters, adjustedAngleDegrees));
+    return Optional.of(new CubeDetection(getLatency(), coneDistanceMeters, adjustedAngleDegrees));
   }
 
   public Optional<Double> getAngleToConeDeg() {
@@ -447,7 +439,7 @@ public class ClawLimelight extends SubsystemBase {
     Optional<Double> maybeXPixels = getXOfSmallestY(corners);
 
     if (!maybeXPixels.isPresent()) {
-      System.out.println("Didn't see cone");
+      System.out.println("Didn't see cube");
       return Optional.empty();
     }
 
@@ -466,7 +458,7 @@ public class ClawLimelight extends SubsystemBase {
     double angleAdjustDegrees = -3.0; // due to limelight yaw
     double adjustedAngleDegrees = angleXDegrees + angleAdjustDegrees;
 
-    System.out.println("Cone at " + adjustedAngleDegrees);
+    System.out.println("Cube at " + adjustedAngleDegrees);
 
     return Optional.of(adjustedAngleDegrees);
   }
