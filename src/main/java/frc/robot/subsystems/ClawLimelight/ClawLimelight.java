@@ -224,7 +224,7 @@ public class ClawLimelight extends SubsystemBase {
   }
 
   /**
-   * @return true is limelight has made a target else false
+   * @return true if limelight has made a target, else false
    */
   public boolean isValidTarget() {
     return getValidTarget() > 0;
@@ -311,7 +311,7 @@ public class ClawLimelight extends SubsystemBase {
      *
      * <p>This becomes a vector [x_norm, y_norm, z_norm] * d = [x_target, diff_height, z_target]
      *
-     * <p>x_norm * d = x_target y_norm * d = diff_height z_target * d = z_target
+     * <p>x_norm * d = x_target, y_norm * d = diff_height, z_target * d = z_target
      */
     double scaling = diff_height / y_norm;
     double x_target = scaling * x_norm;
@@ -343,7 +343,7 @@ public class ClawLimelight extends SubsystemBase {
 
   public Optional<Double> getXOfSmallestY(double[] corners) {
     // Format: x1 y1 x2 y2 x3 y3 . . .
-    double minY = 10000000;
+    double minY = Double.MAX_VALUE;
     int minYIdx = 0;
 
     if (corners.length == 0) {
@@ -398,12 +398,12 @@ public class ClawLimelight extends SubsystemBase {
    * @return If empty, no cube detected. First value is cube yaw in degrees (ccw), second value is
    *     distance in meters.
    */
-  public Optional<CubeDetection> getConePos() {
+  public Optional<CubeDetection> getCubePos() {
     double[] corners = table.getEntry("tcornxy").getDoubleArray(new double[0]);
     Optional<Double> maybeXPixels = getXOfSmallestY(corners);
     Optional<Double> maybeYHeightPixels = getObjectHeightPx(corners);
 
-    if (!maybeXPixels.isPresent() || !maybeYHeightPixels.isPresent()) {
+    if (!maybeXPixels.isPresent() || !maybeYHeightPixels.isPresent() || !tclass.getString("CONE").equals("CUBE")) {
       System.out.println("Didn't see cube");
       return Optional.empty();
     }
@@ -417,8 +417,8 @@ public class ClawLimelight extends SubsystemBase {
     double yPixels = maybeYHeightPixels.get();
     double normYPixels = (1 / halfResYPixels) * yPixels;
     double viewplaneYPixels = viewplaneHeightPixels / 2.0 * normYPixels;
-    final double CONE_HEIGHT_METERS = Units.inchesToMeters(13.0);
-    double coneDistanceMeters = CONE_HEIGHT_METERS / viewplaneYPixels;
+    final double CUBE_HEIGHT_METERS = Units.inchesToMeters(13.0);
+    double cubeDistanceMeters = CUBE_HEIGHT_METERS / viewplaneYPixels;
 
     // Compute cube angle based on
     // https://docs.limelightvision.io/en/latest/theory.html#from-pixels-to-angles
@@ -431,10 +431,10 @@ public class ClawLimelight extends SubsystemBase {
     double angleXDegrees = Units.radiansToDegrees(Math.atan2(viewplaneXPixels, 1));
     double angleAdjustDegrees = -3.0; // due to limelight yaw
     double adjustedAngleDegrees = angleXDegrees + angleAdjustDegrees;
-    return Optional.of(new CubeDetection(getLatency(), coneDistanceMeters, adjustedAngleDegrees));
+    return Optional.of(new CubeDetection(getLatency(), cubeDistanceMeters, adjustedAngleDegrees));
   }
 
-  public Optional<Double> getAngleToConeDeg() {
+  public Optional<Double> getAngleToCubeDeg() {
     double[] corners = table.getEntry("tcornxy").getDoubleArray(new double[0]);
     Optional<Double> maybeXPixels = getXOfSmallestY(corners);
 
