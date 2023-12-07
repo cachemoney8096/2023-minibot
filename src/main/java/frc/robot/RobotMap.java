@@ -1,15 +1,27 @@
 package frc.robot;
 
 public class RobotMap {
+  //   /** Driving Motor CAN IDs */
+  //   public static final int FRONT_LEFT_DRIVE_MOTOR_CAN_ID = 13,
+  //       FRONT_RIGHT_DRIVE_MOTOR_CAN_ID = 19,
+  //       BACK_LEFT_DRIVE_MOTOR_CAN_ID = 7,
+  //       BACK_RIGHT_DRIVE_MOTOR_CAN_ID = 8;
+
+  //   /** Steering Motor CAN IDs */
+  //   public static final int FRONT_LEFT_STEERING_MOTOR_CAN_ID = 4,
+  //       FRONT_RIGHT_STEERING_MOTOR_CAN_ID = 3,
+  //       BACK_LEFT_STEERING_MOTOR_CAN_ID = 11,
+  //       BACK_RIGHT_STEERING_MOTOR_CAN_ID = 15;
+
   /** Driving Motor CAN IDs */
   public static final int FRONT_LEFT_DRIVE_MOTOR_CAN_ID = 13,
-      FRONT_RIGHT_DRIVE_MOTOR_CAN_ID = 19,
-      BACK_LEFT_DRIVE_MOTOR_CAN_ID = 7,
-      BACK_RIGHT_DRIVE_MOTOR_CAN_ID = 8;
+      FRONT_RIGHT_DRIVE_MOTOR_CAN_ID = 3,
+      BACK_LEFT_DRIVE_MOTOR_CAN_ID = 8,
+      BACK_RIGHT_DRIVE_MOTOR_CAN_ID = 7;
 
   /** Steering Motor CAN IDs */
   public static final int FRONT_LEFT_STEERING_MOTOR_CAN_ID = 4,
-      FRONT_RIGHT_STEERING_MOTOR_CAN_ID = 3,
+      FRONT_RIGHT_STEERING_MOTOR_CAN_ID = 19,
       BACK_LEFT_STEERING_MOTOR_CAN_ID = 11,
       BACK_RIGHT_STEERING_MOTOR_CAN_ID = 15;
 
@@ -24,7 +36,7 @@ public class RobotMap {
   public static final int CANDLE_CAN_ID = 50;
 
   /** Pigeon Gyro CAN ID */
-  public static final int PIGEON_CAN_ID = 50;
+  public static final int PIGEON_CAN_ID = 42;
 
   /** Channel for the game piece sensor */
   public static final int GRABBER_GAME_PIECE_SENSOR_DIO = 0;
