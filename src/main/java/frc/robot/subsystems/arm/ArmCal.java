@@ -15,15 +15,15 @@ public class ArmCal {
   /** parameters for arm controller */
   public static final double
       ARM_MAX_VELOCITY_DEG_PER_SECOND =
-          30.0, // 5880 rpm / (60 sec/min) * (360 deg/rev) / 135.4 = 250.56
+          5.0, // 5880 rpm / (60 sec/min) * (360 deg/rev) / 135.4 = 250.56
       ARM_MAX_ACCELERATION_DEG_PER_SECOND_SQUARED =
-          30.0; // angular accel = Torque / Inertia. 3.36 Nm * 135.4 / (7.26 * 0.3^2) kg-m^2 * (360
+          5.0; // angular accel = Torque / Inertia. 3.36 Nm * 135.4 / (7.26 * 0.3^2) kg-m^2 * (360
   // deg / 2pi
   // rad) = 39893 deg/s^2
 
   /** Arm positions in degrees for the armPositionMap */
   public static final double ARM_START_POSITION_DEG = 180.0,
-      ARM_INTAKE_POSITION_DEG = 85.0,
+      ARM_INTAKE_POSITION_DEG = 90.0,
       ARM_LOW_POSITION_DEG = 240.0,
       ARM_HIGH_MID_POSITION_DEG = 210.0,
       ARM_AVOID_LIMELIGHT_POSITION_DEG = 250.0;
