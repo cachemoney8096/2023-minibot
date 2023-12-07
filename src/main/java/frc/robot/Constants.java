@@ -18,4 +18,5 @@ public final class Constants {
   public static final float PLACEHOLDER_FLOAT = 0;
 
   public static final int NUM_CANDLE_LEDS = PLACEHOLDER_INT;
+  public static final double FIELD_WIDTH_METERS = 8.02;
 }
