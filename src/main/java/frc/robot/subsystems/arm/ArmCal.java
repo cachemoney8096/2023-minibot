@@ -15,9 +15,9 @@ public class ArmCal {
   /** parameters for arm controller */
   public static final double
       ARM_MAX_VELOCITY_DEG_PER_SECOND =
-          5.0, // 5880 rpm / (60 sec/min) * (360 deg/rev) / 135.4 = 250.56
+          15.0, // 5880 rpm / (60 sec/min) * (360 deg/rev) / 135.4 = 250.56
       ARM_MAX_ACCELERATION_DEG_PER_SECOND_SQUARED =
-          5.0; // angular accel = Torque / Inertia. 3.36 Nm * 135.4 / (7.26 * 0.3^2) kg-m^2 * (360
+          15.0; // angular accel = Torque / Inertia. 3.36 Nm * 135.4 / (7.26 * 0.3^2) kg-m^2 * (360
   // deg / 2pi
   // rad) = 39893 deg/s^2
 
@@ -43,7 +43,7 @@ public class ArmCal {
 
   public static final float ARM_NEGATIVE_LIMIT_DEGREES = 75;
   public static final float ARM_POSITIVE_LIMIT_DEGREES = 275;
-  public static final int ARM_CURRENT_LIMIT_AMPS = 10;
+  public static final int ARM_CURRENT_LIMIT_AMPS = 25;
 
   /** Various timeouts for auto lift movements */
   public static final double SCORE_TO_START_FAST_SEC = PLACEHOLDER_DOUBLE,

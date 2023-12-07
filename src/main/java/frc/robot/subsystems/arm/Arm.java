@@ -114,7 +114,7 @@ public class Arm extends SubsystemBase {
     double armDemandVoltsB =
         ArmCal.ARM_FEEDFORWARD.calculate(
             getArmAngleRelativeToHorizontal() * (Math.PI / 180.0), armController.getSetpoint().velocity  * (Math.PI / 180.0));
-    // armMotor.setVoltage(armDemandVoltsA + armDemandVoltsB);
+    armMotor.setVoltage(armDemandVoltsA + armDemandVoltsB);
     SmartDashboard.putNumber("Arm PID", armDemandVoltsA);
     SmartDashboard.putNumber("Arm FF", armDemandVoltsB);
   }
