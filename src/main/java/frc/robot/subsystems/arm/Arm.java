@@ -39,7 +39,8 @@ public class Arm extends SubsystemBase {
   public CANSparkMax armMotor =
       new CANSparkMax(RobotMap.ARM_PIVOT_MOTOR_CAN_ID, MotorType.kBrushless);
 
-  private final AbsoluteEncoder armEncoder = armMotor.getAbsoluteEncoder(Type.kDutyCycle);
+  private final AbsoluteEncoder armAbsoluteEncoder = armMotor.getAbsoluteEncoder(Type.kDutyCycle);
+  private final RelativeEncoder armRelativeEncoder = armMotor.getEncoder();
 
   public ScoringLocationUtil scoreLoc;
   private ArmPosition desiredPosition = ArmPosition.STARTING;
@@ -57,6 +58,9 @@ public class Arm extends SubsystemBase {
               ArmCal.ARM_MAX_VELOCITY_DEG_PER_SECOND,
               ArmCal.ARM_MAX_ACCELERATION_DEG_PER_SECOND_SQUARED));
 
+  private double mostRecentArmPID = 0.0;
+  private double mostRecentArmFF = 0.0;
+
   public Arm(ScoringLocationUtil scoreLoc) {
 
     SparkMaxUtils.initWithRetry(this::initSparks, Calibrations.SPARK_INIT_RETRY_ATTEMPTS);
@@ -73,6 +77,7 @@ public class Arm extends SubsystemBase {
 
   public void initialize() {
     SparkMaxUtils.initWithRetry(this::initSparks, Calibrations.SPARK_INIT_RETRY_ATTEMPTS);
+    armController.setGoal(this.getArmAngle());
   }
 
   /** Sets the desired position */
@@ -99,7 +104,7 @@ public class Arm extends SubsystemBase {
   }
   /** Returns the arm angle with the zero value applied */
   public double getArmAngle() {
-    return armEncoder.getPosition() - ArmCal.armAbsoluteEncoderZeroPosDeg;
+    return armAbsoluteEncoder.getPosition() - ArmCal.armAbsoluteEncoderZeroPosDeg;
   }
 
   /** Sends set the goal and desired information */
@@ -113,10 +118,13 @@ public class Arm extends SubsystemBase {
     double armDemandVoltsA = armController.calculate(getArmAngle());
     double armDemandVoltsB =
         ArmCal.ARM_FEEDFORWARD.calculate(
-            getArmAngleRelativeToHorizontal() * (Math.PI / 180.0), armController.getSetpoint().velocity  * (Math.PI / 180.0));
-    armMotor.setVoltage(armDemandVoltsA + armDemandVoltsB);
+            getArmAngleRelativeToHorizontal() * (Math.PI / 180.0),
+            armController.getSetpoint().velocity * (Math.PI / 180.0));
+    // armMotor.setVoltage(armDemandVoltsA + armDemandVoltsB);
     SmartDashboard.putNumber("Arm PID", armDemandVoltsA);
     SmartDashboard.putNumber("Arm FF", armDemandVoltsB);
+    mostRecentArmPID = armDemandVoltsA;
+    mostRecentArmFF = armDemandVoltsB;
   }
 
   public void deployArmLessFar() {
@@ -162,7 +170,7 @@ public class Arm extends SubsystemBase {
   }
 
   public void zeroArmAtCurrentPos() {
-    ArmCal.armAbsoluteEncoderZeroPosDeg = armEncoder.getPosition();
+    ArmCal.armAbsoluteEncoderZeroPosDeg = armAbsoluteEncoder.getPosition();
     System.out.println("New Zero for Arm: " + ArmCal.armAbsoluteEncoderZeroPosDeg);
   }
 
@@ -173,9 +181,7 @@ public class Arm extends SubsystemBase {
     int errors = 0;
     double degreesPerRotation = 360.0 / ratio;
     errors += SparkMaxUtils.check(sparkMaxEncoder.setPositionConversionFactor(degreesPerRotation));
-    errors +=
-        SparkMaxUtils.check(
-            sparkMaxEncoder.setVelocityConversionFactor(degreesPerRotation));
+    errors += SparkMaxUtils.check(sparkMaxEncoder.setVelocityConversionFactor(degreesPerRotation));
     return errors;
   }
 
@@ -227,22 +233,31 @@ public class Arm extends SubsystemBase {
     errors += SparkMaxUtils.check(armMotor.restoreFactoryDefaults());
 
     // inverting stuff
-    errors += SparkMaxUtils.check(armEncoder.setInverted(true));
+    errors += SparkMaxUtils.check(armAbsoluteEncoder.setInverted(true));
     armMotor.setInverted(false);
 
-    errors += setDegreesFromGearRatioAbsoluteEncoder(armEncoder, 26.0/24.0);
+    errors += setDegreesFromGearRatioAbsoluteEncoder(armAbsoluteEncoder, 26.0 / 24.0);
+
+    errors += SparkMaxUtils.check(armRelativeEncoder.setPosition(getArmAngle()));
+    errors +=
+        setDegreesFromGearRatioRelativeEncoder(
+            armRelativeEncoder, ArmConstants.ARM_MOTOR_GEAR_RATIO);
 
     errors +=
         SparkMaxUtils.check(
             armMotor.setSoftLimit(SoftLimitDirection.kForward, ArmCal.ARM_POSITIVE_LIMIT_DEGREES));
 
-    errors += SparkMaxUtils.check(armMotor.setSoftLimit(SoftLimitDirection.kForward, ArmCal.ARM_POSITIVE_LIMIT_DEGREES));
+    errors +=
+        SparkMaxUtils.check(
+            armMotor.setSoftLimit(SoftLimitDirection.kForward, ArmCal.ARM_POSITIVE_LIMIT_DEGREES));
 
-    errors += SparkMaxUtils.check(armMotor.enableSoftLimit(SoftLimitDirection.kForward, true));
+    errors += SparkMaxUtils.check(armMotor.enableSoftLimit(SoftLimitDirection.kForward, false));
 
-    errors += SparkMaxUtils.check(armMotor.setSoftLimit(SoftLimitDirection.kReverse, ArmCal.ARM_NEGATIVE_LIMIT_DEGREES));
+    errors +=
+        SparkMaxUtils.check(
+            armMotor.setSoftLimit(SoftLimitDirection.kReverse, ArmCal.ARM_NEGATIVE_LIMIT_DEGREES));
 
-    errors += SparkMaxUtils.check(armMotor.enableSoftLimit(SoftLimitDirection.kReverse, true));
+    errors += SparkMaxUtils.check(armMotor.enableSoftLimit(SoftLimitDirection.kReverse, false));
 
     errors += SparkMaxUtils.check(armMotor.setIdleMode(IdleMode.kBrake));
 
@@ -265,18 +280,22 @@ public class Arm extends SubsystemBase {
     super.initSendable(builder);
     SendableHelper.addChild(builder, this, armController, "ArmController");
 
-    builder.addDoubleProperty(
-        "Arm Abs Position (deg)", armEncoder::getPosition, null);
-    
-        builder.addDoubleProperty(
-          "Arm Angle (deg)", this::getArmAngle, null);
-      
-        builder.addBooleanProperty("Is cancelled", this::getCancelScore, this::setCancelScore);
+    builder.addDoubleProperty("Arm Abs Position (deg)", armAbsoluteEncoder::getPosition, null);
+
+    builder.addDoubleProperty("Arm Angle (deg)", this::getArmAngle, null);
+
+    builder.addBooleanProperty("Is cancelled", this::getCancelScore, this::setCancelScore);
     // builder.addDoubleProperty(
     //     "Arm Position (deg)", () -> {return armMotor.getEncoder().getPosition();}, null);
-    builder.addDoubleProperty("Arm Vel (deg per s)", armEncoder::getVelocity, null);
+    builder.addDoubleProperty("Arm Vel (deg per s)", armAbsoluteEncoder::getVelocity, null);
 
     builder.addDoubleProperty("Arm output", armMotor::get, null);
+    builder.addDoubleProperty(
+        "Arm Controller Goal (deg)",
+        () -> {
+          return armController.getGoal().position;
+        },
+        null);
     builder.addStringProperty(
         "Score Loc Height",
         () -> {
@@ -302,6 +321,20 @@ public class Arm extends SubsystemBase {
         "Score Loc Col",
         () -> {
           return scoreLoc.getScoreCol().toString();
+        },
+        null);
+    builder.addDoubleProperty(
+        "Arm Angle Relative to Horizontal", this::getArmAngleRelativeToHorizontal, null);
+    builder.addDoubleProperty(
+        "Arm PID",
+        () -> {
+          return mostRecentArmPID;
+        },
+        null);
+    builder.addDoubleProperty(
+        "Arm FF",
+        () -> {
+          return mostRecentArmFF;
         },
         null);
   }

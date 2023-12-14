@@ -43,7 +43,7 @@ public class ArmCal {
 
   public static final float ARM_NEGATIVE_LIMIT_DEGREES = 75;
   public static final float ARM_POSITIVE_LIMIT_DEGREES = 275;
-  public static final int ARM_CURRENT_LIMIT_AMPS = 25;
+  public static final int ARM_CURRENT_LIMIT_AMPS = 5;
 
   /** Various timeouts for auto lift movements */
   public static final double SCORE_TO_START_FAST_SEC = PLACEHOLDER_DOUBLE,
