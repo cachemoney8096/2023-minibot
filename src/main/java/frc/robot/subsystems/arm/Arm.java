@@ -77,6 +77,12 @@ public class Arm extends SubsystemBase {
 
   public void initialize() {
     SparkMaxUtils.initWithRetry(this::initSparks, Calibrations.SPARK_INIT_RETRY_ATTEMPTS);
+    initControlLoop();
+  }
+
+  public void initControlLoop(){
+    armController.setTolerance(ArmCal.ARM_ALLOWED_CLOSED_LOOP_ERROR_DEG);
+    armController.reset(this.getArmAngle());
     armController.setGoal(this.getArmAngle());
   }
 
@@ -120,7 +126,8 @@ public class Arm extends SubsystemBase {
         ArmCal.ARM_FEEDFORWARD.calculate(
             getArmAngleRelativeToHorizontal() * (Math.PI / 180.0),
             armController.getSetpoint().velocity * (Math.PI / 180.0));
-    // armMotor.setVoltage(armDemandVoltsA + armDemandVoltsB);
+    armMotor.setVoltage(armDemandVoltsA + armDemandVoltsB);
+    // armMotor.setVoltage(0);
     SmartDashboard.putNumber("Arm PID", armDemandVoltsA);
     SmartDashboard.putNumber("Arm FF", armDemandVoltsB);
     mostRecentArmPID = armDemandVoltsA;
@@ -234,7 +241,7 @@ public class Arm extends SubsystemBase {
 
     // inverting stuff
     errors += SparkMaxUtils.check(armAbsoluteEncoder.setInverted(true));
-    armMotor.setInverted(false);
+    armMotor.setInverted(true);
 
     errors += setDegreesFromGearRatioAbsoluteEncoder(armAbsoluteEncoder, 26.0 / 24.0);
 

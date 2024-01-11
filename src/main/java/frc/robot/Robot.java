@@ -134,6 +134,8 @@ public class Robot extends TimedRobot {
         ModuleConstants.TURNING_MOTOR_IDLE_MODE);
     m_robotContainer.drive.backRight.turningSparkMax.setIdleMode(
         ModuleConstants.TURNING_MOTOR_IDLE_MODE);
+    
+    m_robotContainer.arm.initControlLoop();
   }
 
   /** This function is called periodically during operator control. */

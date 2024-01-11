@@ -1,6 +1,8 @@
 package frc.robot.subsystems.grabber;
 
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.RelativeEncoder;
+import com.revrobotics.SparkMaxRelativeEncoder;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -18,8 +20,11 @@ public class Grabber extends SubsystemBase {
   private CANSparkMax frontMotor =
       new CANSparkMax(RobotMap.FRONT_INTAKE_ROLLER_MOTOR_CAN_ID, MotorType.kBrushless);
 
-  private CANSparkMax backMotor =
+  public CANSparkMax backMotor =
       new CANSparkMax(RobotMap.BACK_INTAKE_ROLLER_MOTOR_CAN_ID, MotorType.kBrushless);
+
+  private RelativeEncoder frontEncoder = frontMotor.getEncoder();
+  private RelativeEncoder backEncoder = backMotor.getEncoder();
 
   private final DigitalInput gamePieceSensor =
       new DigitalInput(RobotMap.GRABBER_GAME_PIECE_SENSOR_DIO);
@@ -39,14 +44,17 @@ public class Grabber extends SubsystemBase {
     SparkMaxUtils.initWithRetry(this::initSparks, Calibrations.SPARK_INIT_RETRY_ATTEMPTS);
   }
 
-  public void spinMotors(double power) {
+  public void setMotors(double power) {
     runningCommand = !(Math.abs(power) < 0.01);
     frontMotor.set(power);
     backMotor.set(power);
+    System.out.println("spinning grabber motors at " + power);
+    System.out.println("back motor: " + backMotor.get());
   }
 
   public void intake() {
-    spinMotors(GrabberCalibrations.INTAKING_POWER);
+    setMotors(GrabberCalibrations.INTAKING_POWER);
+    System.out.println("intaking");
   }
 
   public void score(ScoreHeight height) {
@@ -58,15 +66,15 @@ public class Grabber extends SubsystemBase {
     } else {
       scoringPower = GrabberCalibrations.SCORE_HIGH_POWER;
     }
-    spinMotors(scoringPower);
+    setMotors(scoringPower);
   }
 
   public void eject() {
-    spinMotors(GrabberCalibrations.EJECTION_POWER);
+    setMotors(GrabberCalibrations.EJECTION_POWER);
   }
 
   public void stopMotors() {
-    spinMotors(0.0);
+    setMotors(0.0);
   }
 
   public boolean seeGamePiece() {
@@ -111,11 +119,12 @@ public class Grabber extends SubsystemBase {
     builder.addDoubleProperty("Front Motor Set Speed", frontMotor::get, frontMotor::set);
     builder.addDoubleProperty("Back Motor Set Speed", backMotor::get, backMotor::set);
     builder.addBooleanProperty("Sensor sees game piece", this::seeGamePiece, null);
+    builder.addBooleanProperty("Running command", () -> {return this.runningCommand;}, null);
   }
 
   public void periodic() {
     if (seeGamePiece() && !runningCommand) {
-      spinMotors(GrabberCalibrations.HOLD_GAME_OBJECT_POWER);
+      setMotors(GrabberCalibrations.HOLD_GAME_OBJECT_POWER);
     }
   }
 }

@@ -29,8 +29,8 @@ public class RobotMap {
   public static final int ARM_PIVOT_MOTOR_CAN_ID = 5;
 
   /** Intake Roller Motor CAN IDs */
-  public static final int FRONT_INTAKE_ROLLER_MOTOR_CAN_ID = 9,
-      BACK_INTAKE_ROLLER_MOTOR_CAN_ID = 10;
+  public static final int FRONT_INTAKE_ROLLER_MOTOR_CAN_ID = 10,
+      BACK_INTAKE_ROLLER_MOTOR_CAN_ID = 9;
 
   /** CANdle for the lights */
   public static final int CANDLE_CAN_ID = 50;
