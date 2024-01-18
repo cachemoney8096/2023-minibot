@@ -5,7 +5,7 @@ import frc.robot.utils.RingBuffer;
 
 import java.util.NoSuchElementException;
 
-public class RingBufferTests {
+public class RingBufferTest {
 
     @Test
     void test(){
