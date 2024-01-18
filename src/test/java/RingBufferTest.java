@@ -1,6 +1,5 @@
-import static org.junit.Assert.*;
 import org.junit.jupiter.api.Test;
-
+import org.junit.*;
 
 import frc.robot.utils.RingBuffer;
 
@@ -8,6 +7,10 @@ import java.util.NoSuchElementException;
 
 public class RingBufferTests {
 
+    @Test
+    void test(){
+        assert true;
+    }
     @Test
     public void populateAndRandomAccess() {
         RingBuffer<Integer> buffer = new RingBuffer<>();
