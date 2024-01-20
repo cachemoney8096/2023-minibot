@@ -20,7 +20,8 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.FinishScore;
 import frc.robot.commands.IntakeSequence;
-import frc.robot.subsystems.ClawLimelight;
+import frc.robot.subsystems.ClawLimelight.ClawLimelight;
+import frc.robot.subsystems.ClawLimelight.ClawLimelightCal;
 import frc.robot.subsystems.Lights;
 import frc.robot.subsystems.TagLimelight;
 import frc.robot.subsystems.arm.Arm;
@@ -60,7 +61,12 @@ public class RobotContainer {
 
   private final ScoringLocationUtil scoreLoc = new ScoringLocationUtil();
   public Arm arm = new Arm(scoreLoc);
-  private ClawLimelight clawLimelight = new ClawLimelight();
+  private ClawLimelight clawLimelight =
+      new ClawLimelight(
+          ClawLimelightCal.CLAW_LIMELIGHT_ANGLE_DEG,
+          ClawLimelightCal.CLAW_LIMELIGHT_HEIGHT_METERS,
+          ClawLimelightCal.CLAW_LIMELIGHT_TARGET_HEIGH_METERS,
+          ClawLimelightCal.CLAW_LIMELIGHT_TARGET_CLASS);
   private Grabber grabber = new Grabber(rumbleBriefly);
   private Lights lights = new Lights();
   private TagLimelight tagLimelight = new TagLimelight();
