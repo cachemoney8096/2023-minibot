@@ -23,14 +23,17 @@ public class PoseBuffer {
     }
 
     public Optional<Pose2d> getPoseAtTimestamp(double timestamp){
-        if(buffer.size() < 2){
-            return Optional.empty();
-        }
         if(buffer.getFromFirst(0).getFirst() >= timestamp && buffer.getFromLast(0).getFirst() <= timestamp){
             for(int i = 0; i < buffer.size(); i++){
                 if(buffer.getFromFirst(i).getFirst() >= timestamp && buffer.getFromFirst(i+1).getFirst() <= timestamp){
                     Pair<Double, Pose2d> timedPoseA = buffer.getFromFirst(i);
-                    Pair<Double, Pose2d> timedPoseB = buffer.getFromFirst(i+1);
+                    Pair<Double, Pose2d> timedPoseB;
+                    try{
+                        timedPoseB = buffer.getFromFirst(i+1);
+                    }
+                    catch(Exception e){
+                        return Optional.of(timedPoseA.getSecond());
+                    }
                     double percentage = (timedPoseA.getFirst()-timestamp)/(timedPoseA.getFirst()-timedPoseB.getFirst());
                     return Optional.of(timedPoseA.getSecond().interpolate(timedPoseB.getSecond(), percentage));
                 }
