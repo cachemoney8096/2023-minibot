@@ -23,6 +23,9 @@ public class PoseBuffer {
     }
 
     public Optional<Pose2d> getPoseAtTimestamp(double timestamp){
+        if(buffer.size() < 2){
+            return Optional.empty();
+        }
         if(buffer.getFromFirst(0).getFirst() >= timestamp && buffer.getFromLast(0).getFirst() <= timestamp){
             for(int i = 0; i < buffer.size(); i++){
                 if(buffer.getFromFirst(i).getFirst() >= timestamp && buffer.getFromFirst(i+1).getFirst() <= timestamp){
