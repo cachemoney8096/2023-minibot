@@ -63,7 +63,7 @@ public class RobotContainer {
   private ClawLimelight clawLimelight = new ClawLimelight();
   private Grabber grabber = new Grabber(rumbleBriefly);
   private Lights lights = new Lights();
-  private TagLimelight tagLimelight = new TagLimelight();
+  private TagLimelight tagLimelight = new TagLimelight(scoreLoc);
   public DriveSubsystem drive = new DriveSubsystem(lights, () -> timedMatch);
 
   // A chooser for autonomous commands
